@@ -76,8 +76,3 @@ smart-meal-planner/
 
 ---
 
-## Notes
-
-- This project is in early development. Pages are placeholders until features are built.
-- For AI features, you can use Cohere or Hugging Face for free (see their docs for limits).
-- Contributions welcome!
