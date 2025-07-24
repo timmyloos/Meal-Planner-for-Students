@@ -4,6 +4,19 @@ A web app to help students generate healthy, affordable, and personalized meal p
 
 ---
 
+## Quick Start
+
+If you have cloned this project, run the following commands in the `smart-meal-planner` directory:
+
+```sh
+npm install   # Install all dependencies
+npm run dev   # Start the development server
+```
+
+Then open the local URL (e.g., http://localhost:5173) in your browser.
+
+---
+
 ## Features
 
 - Login page (dummy for now)
