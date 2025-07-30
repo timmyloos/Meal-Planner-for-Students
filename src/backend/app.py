@@ -1,48 +1,39 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 import os
 from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-API_KEY = os.getenv('FOOD_API_KEY')
-print("Loaded API Key:", API_KEY)
-BASE_URL = 'https://api.spoonacular.com/recipes/findByIngredients'
-
+API_KEY = os.getenv('SPOONACULAR_API_KEY')
+BASE_URL = 'https://api.spoonacular.com'
 @app.route('/')
 def home():
-    return 'Flask API is running! Try /api/recipes/by-ingredients?ingredients=apple,bannana'
+    return "Welcome to the Meal Planner API!"
 
-@app.route('/api/recipes/by-ingredients')
-def search_by_ingredients():
+@app.route('/api/recipes/by-ingredients', methods=['GET'])
+def get_recipes_by_ingredients():
+    print("Received request for ingredients search") 
     ingredients = request.args.get('ingredients')
     if not ingredients:
-        print("No ingredients provided in the request.")
         return jsonify({'error': 'No ingredients provided'}), 400
+    try:
+        response = requests.get(
+            f'{BASE_URL}/recipes/findByIngredients',
+            params={
+                'ingredients': ingredients,
+                'number': 5,
+                'apiKey': API_KEY
+            }
+        )
+        response.raise_for_status()
+        recipes = response.json()
+        return jsonify(recipes)
+    except requests.RequestException as e:
+        return jsonify({'error': str(e)}), 500
     
-    print(f"Requesting recipes with ingredients: {ingredients}")
-    print(f"Using API Key: {API_KEY}") 
-
-    #url = f"{BASE_URL}/findByIngredients?ingredients={ingredients}&apiKey={API_KEY}"
-    params = {
-        'ingredients': ingredients,
-        'number': 10,  
-        'apiKey': API_KEY
-    }
-    response = requests.get(BASE_URL, params=params)
-    
-    print(f"Spoonacular Response Status: {response.status_code}")
-    print(f"Spoonacular Response Text: {response.text}")
-    
-    if response.status_code != 200:
-        print('API Error:', response.text)
-        return jsonify({'error': 'Failed to fetch recipes'}), 500
-
-    return jsonify(response.json())
-
-
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0')

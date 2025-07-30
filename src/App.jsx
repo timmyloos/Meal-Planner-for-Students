@@ -27,6 +27,7 @@ function RecipeSearch() {
       const data = await searchRecipesByIngredients(ingredients);
       setRecipes(data);
     } catch (err) {
+      console.error('Error fetching recipes:', err);
       setError('Error fetching recipes');
     } finally {
       setLoading(false);
