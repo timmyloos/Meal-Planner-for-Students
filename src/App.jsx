@@ -11,7 +11,7 @@ import React, { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { searchRecipesByIngredients, generateMealPlan } from './utils/api';
+import { searchRecipesByIngredients, generateMealPlan, addEventToGoogleCalendar, generateMealRecommendations } from './utils/api';
 
 function Navigation() {
   const location = useLocation();
@@ -873,21 +873,167 @@ function MealPlanPage() {
   );
 }
 
+// Google login button
+function GoogleAuthButton({ onLogin }) {
+  const clientId = '85533172291-16pfu8d6lhntu38t21v1vm38lk5q76jc.apps.googleusercontent.com';
+
+  useEffect(() => {
+    function start() {
+      gapi.client.init({
+        clientId,
+        scope: 'https://www.googleapis.com/auth/calendar.events',
+      });
+    }
+    gapi.load('client:auth2', start);
+  }, []);
+
+  const handleLogin = () => {
+    const authInstance = gapi.auth2.getAuthInstance();
+    authInstance.signIn().then(googleUser => {
+      const token = googleUser.getAuthResponse().access_token;
+      console.log('Google access token:', token);
+      onLogin(token);
+    });
+  };
+
+  return (
+    <button onClick={handleLogin} className="login-button">
+      Login with Google Calendar
+    </button>
+  );
+}
+
+// calendar page
 function CalendarPage() {
+  const [accessToken, setAccessToken] = useState(null);
+  const [events, setEvents] = useState([]);
+
+  const addMealToGoogleCalendar = async () => {
+    if (!accessToken) {
+      alert('Please log in first!');
+      return;
+    }
+
+    const event = {
+      summary: 'Grilled Chicken Salad',
+      description: 'Lunch meal from your plan',
+      start: {
+        dateTime: '2025-08-06T12:00:00-04:00',
+        timeZone: 'America/New_York',
+      },
+      end: {
+        dateTime: '2025-08-06T13:00:00-04:00',
+        timeZone: 'America/New_York',
+      },
+    };
+
+    try {
+      const response = await fetch(
+        'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(event),
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to add event');
+      alert('Meal added to calendar!');
+      // Refresh events after adding
+      fetchEvents();
+    } catch (error) {
+      console.error('Add event error:', error);
+      alert('Failed to add meal: ' + error.message);
+    }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch(
+        'https://www.googleapis.com/calendar/v3/calendars/primary/events?orderBy=startTime&singleEvents=true',
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch calendar events');
+      const data = await response.json();
+      console.log('Fetched calendar events:', data.items);
+      setEvents(data.items);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (accessToken) fetchEvents();
+  }, [accessToken]);
+
+  const groupEventsByDate = (events) =>
+    events.reduce((acc, event) => {
+      const date = event.start?.dateTime?.split('T')[0] || event.start?.date;
+      if (!date) return acc;
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(event);
+      return acc;
+    }, {});
+
+  const groupedEvents = groupEventsByDate(events);
+
   return (
     <div className="page-container">
       <div className="page-header">
         <h2>Weekly Calendar</h2>
         <p>View your meal plan in a calendar format</p>
       </div>
-      <div className="content-placeholder">
-        <p>Calendar view will be available once you have a meal plan!</p>
+
+      <GoogleAuthButton onLogin={setAccessToken} />
+
+      <button onClick={addMealToGoogleCalendar} disabled={!accessToken}>
+        Add Meal to Google Calendar
+      </button>
+
+      <div className="events-list">
+        {events.length === 0 ? (
+          <p>No calendar events found.</p>
+        ) : (
+          <div>
+            {Object.keys(groupedEvents).map((date) => (
+              <div key={date}>
+                <h4>{date}</h4>
+                <ul>
+                  {groupedEvents[date].map((event) => (
+                    <li key={event.id}>
+                      <strong>{event.summary || '(No title)'}</strong> <br />
+                      {event.start?.dateTime || event.start?.date} -{' '}
+                      {event.end?.dateTime || event.end?.date}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
+// Recommendations page 
 function RecommendationsPage() {
+  const userPreferences = {
+    height: 170,
+    weight: 70,
+    goal: "Maintain Weight",
+    restrictions: "vegetarian",
+    foodLog: "Oatmeal, tofu salad, lentil soup",
+    recentRecipes: ["Quinoa bowl", "Chickpea stir fry"]
+  };
   return (
     <div className="page-container">
       <div className="page-header">

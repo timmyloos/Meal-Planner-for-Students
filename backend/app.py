@@ -4,113 +4,121 @@ import requests
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+from functools import wraps
+from pathlib import Path
+import google.generativeai as genai
 
 # Load .env from the project root (two directories up from backend)
 load_dotenv('../../.env')
 app = Flask(__name__)
 CORS(app)
 
-API_KEY = os.getenv('VITE_SPOONACULAR_API_KEY')
+API_KEY = os.getenv('SPOONACULAR_API_KEY')
 BASE_URL = 'https://api.spoonacular.com'
 
 ingredients_list = []
 saved_recipes = []
-meal_plan = []
+user_preferences = []
 
-@app.route('/')
-def home():
-    return "Welcome to the Meal Planner API!"
+# Error handling for API requests
+def handle_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print(f"Request error: {e}")
+            return jsonify({'error': str(e)}), 500
+    return wrapper
 
+# log user food preferences
+@app.route('/api/log-user-foods', methods=['POST'])
+@handle_errors
+def log_user_foods():
+    data = request.get_json()
+    if not data or not data.get('foods'):
+        return jsonify({'error': 'No foods provided'}), 400
 
-@app.route('/api/recipes/by-ingredients', methods=['GET'])
-def get_recipes_by_ingredients():
-    print("Received request for ingredients search")
-    ingredients = request.args.get('ingredients')
-    if not ingredients:
-        return jsonify({'error': 'No ingredients provided'}), 400
-    
-    search_ingredients = {
-        'id': len(ingredients_list) + 1,
-        'ingredients': ingredients,
-        'timestamp': datetime.now().isoformat(),
-        'search_count': 1
+    foods = data.get('foods', [])
+    timestamp = data.get('timestamp', datetime.now().isoformat())
+    user_id = data.get('user_id', 'anonymous')
+
+    global user_food_preferences
+    food_entry = {
+        'id': len(user_food_preferences) + 1,
+        'user_id': user_id,
+        'foods': foods,
+        'timestamp': timestamp,
+        'food_count': len(foods)
     }
+    user_food_preferences.append(food_entry)
 
-    existing_search = next((item for item in ingredients_list if item['ingredients'].lower() == ingredients), None)
-    if existing_search:
-        existing_search['search_count'] += 1
-        existing_search['timestamp'] = datetime.now().isoformat()
-    else:
-        ingredients_list.append(search_ingredients)
+    return jsonify({
+        'message': 'Food preferences logged successfully',
+        'foods_logged': len(foods),
+        'total_entries': len(user_food_preferences)
+    }), 201
+
+# get all logged food preferences
+@app.route('/api/user-food-preferences', methods=['GET'])
+def get_user_food_preferences():
+    return jsonify({
+        'food_preferences': user_food_preferences,
+        'total_entries': len(user_food_preferences)
+    })
+
+# Spoonacular API request
+def make_api_request(endpoint, params=None):
+    if params is None:
+        params = {}
+    if not API_KEY:
+        raise Exception("No API key configured")
+
+    params['apiKey'] = API_KEY
+    url = f"{BASE_URL}/{endpoint}"
 
     try:
+        response = requests.get(url, params=params, timeout=15)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            response.raise_for_status()
+    except Exception as e:
+        raise
+
+
+@app.route('/api/recipe-search', methods=['GET'])
+def search_recipes():
+    """Search recipes with advanced filters"""
+    query = request.args.get('query', '')
+    diet = request.args.get('diet', '')
+    cuisine = request.args.get('cuisine', '')
+    max_ready_time = request.args.get('maxReadyTime', '')
+
+    try:
+        params = {
+            'query': query,
+            'number': 10,
+            'addRecipeNutrition': True,
+            'apiKey': API_KEY
+        }
+
+        if diet:
+            params['diet'] = diet
+        if cuisine:
+            params['cuisine'] = cuisine
+        if max_ready_time:
+            params['maxReadyTime'] = max_ready_time
+
         response = requests.get(
-            f'{BASE_URL}/recipes/findByIngredients',
-            params={
-                'ingredients': ingredients,
-                'number': 5,
-                'apiKey': API_KEY
-            }
+            f'{BASE_URL}/recipes/complexSearch',
+            params=params
         )
         response.raise_for_status()
-        recipes = response.json()
-        return jsonify(recipes)
+        return jsonify(response.json())
     except requests.RequestException as e:
         return jsonify({'error': str(e)}), 500
-    
-@app.route('/api/ingredient-history', methods=['GET'])
-def get_ingredient_history():
-    sorted_history = sorted(ingredients_list, key=lambda x: x['timestamp'], reverse=True)
-    return jsonify(sorted_history)
-
-@app.route('/api/save-recipe', methods=['POST'])
-def save_recipe():
-    recipe_data = request.get_json()
-    if not recipe_data:
-        return jsonify({'error': 'No recipe data provided'}), 400
-    
-    existing_recipe = next((item for item in saved_recipes if item['id'] == recipe_data['id']), None)
-    if existing_recipe:
-        return jsonify({'error': 'Recipe already saved'}), 200
-    
-    recipe_data['saved_at'] = datetime.now().isoformat()
-    saved_recipes.append(recipe_data)
-    return jsonify({'message': 'Recipe saved successfully', 'recipe': existing_recipe}), 201
-
-@app.route('/api/saved-recipes', methods=['GET'])
-def get_saved_recipes():
-    sorted_recipes = sorted(saved_recipes, key=lambda x: x['saved_at'], reverse=True)
-    return jsonify(sorted_recipes)
-
-@app.route('/api/delete-recipe/<int:recipe_id>', methods=['DELETE'])
-def delete_recipe(recipe_id):
-    global saved_recipes
-    originial_count = len(saved_recipes)
-    saved_recipes = [recipe for recipe in saved_recipes if recipe['id'] != recipe_id]
-
-    if len(saved_recipes) == originial_count:
-        return jsonify({'error': 'Recipe not found'}), 404
-    
-    return jsonify({'message': 'Recipe deleted successfully'}), 200
-
-# meal plan endpoint
-@app.route('/api/meal-plan', methods=['GET'])
-def get_meal_plan():
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
-    filtered_plan = meal_plan
-    if start_date:
-        filtered_plan = [meal for meal in meal_plan if meal['date'] >= start_date]
-    if end_date:
-        filtered_plan = [meal for meal in filtered_plan if meal['date'] <= end_date]
-
-    sorted_plan = sorted(filtered_plan, key=lambda x: x['created_at'], reverse=True)
-    return jsonify(sorted_plan)
-
-
-    
-
-
+        
 @app.route('/api/generate-meal-plan', methods=['POST'])
 def generate_meal_plan():
     print("Received request for meal plan generation")
@@ -459,39 +467,83 @@ def get_meal_plan_templates():
     except requests.RequestException as e:
         return jsonify({'error': str(e)}), 500
 
-
-@app.route('/api/recipe-search', methods=['GET'])
-def search_recipes():
-    """Search recipes with advanced filters"""
-    query = request.args.get('query', '')
-    diet = request.args.get('diet', '')
-    cuisine = request.args.get('cuisine', '')
-    max_ready_time = request.args.get('maxReadyTime', '')
-
-    try:
-        params = {
-            'query': query,
-            'number': 10,
-            'addRecipeNutrition': True,
-            'apiKey': API_KEY
+@app.route('/api/recipes/by-ingredients', methods=['GET'])
+def get_recipes_by_ingredients():
+    ingredients = request.args.get('ingredients')
+    print(f"Received ingredients:", ingredients)
+    if not ingredients:
+        return jsonify({'error': 'No ingredients provided'}), 400
+    
+    # track search history 
+    global ingredients_list
+    existing = next((item for item in ingredients_list if item['ingredients'].lower() == ingredients.lower()), None)
+    if existing:
+        existing['search_count'] += 1
+        existing['timestamp'] = datetime.now().isoformat()
+    else:
+        search_entry = {
+            'id': len(ingredients_list) + 1,
+            'ingredients': ingredients,
+            'timestamp': datetime.now().isoformat(),
+            'search_count': 1
         }
+        ingredients_list.append(search_entry)
 
-        if diet:
-            params['diet'] = diet
-        if cuisine:
-            params['cuisine'] = cuisine
-        if max_ready_time:
-            params['maxReadyTime'] = max_ready_time
+    params = {
+        'ingredients': ingredients,
+        'number': 5,
+        'ranking': 1,  
+        'apiKey': API_KEY
+    }
+    recipes = make_api_request('recipes/findByIngredients', params)
+    return jsonify(recipes)
+    
+  
+@app.route('/api/ingredient-history', methods=['GET'])
+def get_ingredient_history():
+    sorted_history = sorted(ingredients_list, key=lambda x: x['timestamp'], reverse=True)
+    return jsonify(sorted_history)
 
-        response = requests.get(
-            f'{BASE_URL}/recipes/complexSearch',
-            params=params
-        )
-        response.raise_for_status()
-        return jsonify(response.json())
-    except requests.RequestException as e:
-        return jsonify({'error': str(e)}), 500
+@app.route('/api/save-recipe', methods=['POST'])
+def save_recipe():
+    recipe_data = request.get_json()
+    if not recipe_data or not recipe_data.get('id'):
+        return jsonify({'error': 'Recipe ID is required'}), 400
 
+    global saved_recipes
+    if any(recipe['id'] == recipe_data['id'] for recipe in saved_recipes):
+        return jsonify({'message': 'Recipe already saved'}), 200
+
+    recipe_data['saved_at'] = datetime.now().isoformat()
+    saved_recipes.append(recipe_data)
+    return jsonify({'message': 'Recipe saved successfully', 'recipe': recipe_data}), 201
+
+@app.route('/api/saved-recipes', methods=['GET'])
+def get_saved_recipes():
+    return jsonify(sorted(saved_recipes, key=lambda x: x['saved_at'], reverse=True))
+
+@app.route('/api/delete-recipe/<int:recipe_id>', methods=['DELETE'])
+def delete_recipe(recipe_id):
+    global saved_recipes
+    saved_recipes = [r for r in saved_recipes if r['id'] != recipe_id]
+    return jsonify({'message': 'Recipe deleted successfully'}), 200
+
+# check API health
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'api_key_configured': bool(API_KEY),
+        'api_key_preview': API_KEY[:8] + '...' if API_KEY else 'Not configured',
+        'saved_recipes_count': len(saved_recipes),
+        'ingredient_searches_count': len(ingredients_history),
+        'food_preferences_count': len(user_food_preferences)
+    })
+
+@app.route('/')
+def home():
+    return "Welcome to the Meal Planner API!"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)
