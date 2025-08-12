@@ -13,67 +13,399 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { searchRecipesByIngredients, generateMealPlan, addEventToGoogleCalendar, generateMealRecommendations } from './utils/api';
 
+const BACKEND_URL = 'http://localhost:5001';
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/auth/check`, {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+      } else {
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      navigate('/login');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="page-container">
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <h3>Loading...</h3>
+        </div>
+      </div>
+    );
+  }
+
+  return user ? children : null;
+};
+
+// Chatbot component
+const Chatbot = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      text: "Hi! I'm your nutrition assistant. Ask me anything about meal planning, nutrition, or healthy eating!",
+      sender: 'bot',
+      timestamp: new Date()
+    }
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const sendMessage = async () => {
+    if (!inputMessage.trim()) return;
+
+    const userMessage = {
+      id: Date.now(),
+      text: inputMessage,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/chatbot`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: inputMessage
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const botMessage = {
+          id: Date.now() + 1,
+          text: data.response,
+          sender: 'bot',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, botMessage]);
+      } else {
+        throw new Error('Failed to get response');
+      }
+    } catch (error) {
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: "Sorry, I'm having trouble connecting right now. Please try again later!",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  return (
+    <div className="chatbot-container">
+      {/* Chatbot Toggle Button */}
+      <button 
+        className="chatbot-toggle"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Toggle chatbot"
+      >
+        {isOpen ? '✕' : '💬'}
+      </button>
+
+      {/* Chatbot Window */}
+      {isOpen && (
+        <div className="chatbot-window">
+          <div className="chatbot-header">
+            <h3>Nutrition Assistant</h3>
+            <button 
+              className="chatbot-close"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close chatbot"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="chatbot-messages">
+            {messages.map((message) => (
+              <div 
+                key={message.id} 
+                className={`chatbot-message ${message.sender}`}
+              >
+                <div className="message-content">
+                  {message.text}
+                </div>
+                <div className="message-time">
+                  {message.timestamp.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="chatbot-message bot">
+                <div className="message-content">
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="chatbot-input">
+            <textarea
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask me about nutrition, meal planning, or healthy eating..."
+              disabled={isLoading}
+              rows="2"
+            />
+            <button 
+              onClick={sendMessage}
+              disabled={!inputMessage.trim() || isLoading}
+              className="chatbot-send"
+            >
+              ➤
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 function Navigation() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      console.log('Checking auth status...');
+      const response = await fetch(`${BACKEND_URL}/api/auth/check`, {
+        credentials: 'include'
+      });
+      
+      console.log('Auth check response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Auth check successful, user data:', data);
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+      } else {
+        console.log('Auth check failed, not authenticated');
+        setUser(null);
+        localStorage.removeItem('user');
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setUser(null);
+      localStorage.removeItem('user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${BACKEND_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      setUser(null);
+      localStorage.removeItem('user');
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <nav className="nav">
+        <div className="nav-container">
+          <h1 className="nav-title">SmartMeals</h1>
+          <div className="nav-links">
+            <span className="nav-loading">Loading...</span>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  console.log('Navigation render - user:', user, 'loading:', loading);
   
   return (
     <nav className="nav">
       <div className="nav-container">
-        <h1 className="nav-title">Smart Meal Planner</h1>
+        <h1 className="nav-title">SmartMeals</h1>
         <div className="nav-links">
-          <Link 
-            to="/login" 
-            className={`nav-link ${location.pathname === '/login' ? 'active' : ''}`}
-          >
-            Login
-          </Link>
-          <Link 
-            to="/diet-input" 
-            className={`nav-link ${location.pathname === '/diet-input' ? 'active' : ''}`}
-          >
-            Diet Input
-          </Link>
-          <Link 
-            to="/meal-plan" 
-            className={`nav-link ${location.pathname === '/meal-plan' ? 'active' : ''}`}
-          >
-            Meal Plan
-          </Link>
-          <Link 
-            to="/calendar" 
-            className={`nav-link ${location.pathname === '/calendar' ? 'active' : ''}`}
-          >
-            Calendar
-          </Link>
-          <Link 
-            to="/recommendations" 
-            className={`nav-link ${location.pathname === '/recommendations' ? 'active' : ''}`}
-          >
-            Recommendations
-          </Link>
+          {user ? (
+            <>
+              <span className="nav-user">Welcome, {user.username}!</span>
+              <Link 
+                to="/diet-input" 
+                className={`nav-link ${location.pathname === '/diet-input' ? 'active' : ''}`}
+              >
+                Diet Input
+              </Link>
+              <Link 
+                to="/meal-plan" 
+                className={`nav-link ${location.pathname === '/meal-plan' ? 'active' : ''}`}
+              >
+                Meal Plan
+              </Link>
+              <Link 
+                to="/calendar" 
+                className={`nav-link ${location.pathname === '/calendar' ? 'active' : ''}`}
+              >
+                Calendar
+              </Link>
+              <Link 
+                to="/recommendations" 
+                className={`nav-link ${location.pathname === '/recommendations' ? 'active' : ''}`}
+              >
+                Recommendations
+              </Link>
+              <button onClick={handleLogout} className="nav-link nav-logout">
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link 
+              to="/login" 
+              className={`nav-link ${location.pathname === '/login' ? 'active' : ''}`}
+            >
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </nav>
   );
 }
 
-function LoginPage() {
+function LoginPage({ onLoginSuccess }) {
+  const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // For now, just redirect to diet input
-    window.location.href = '/diet-input';
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
+      const data = isLogin ? { username, password } : { username, email, password };
+
+      const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSuccess(result.message);
+        // Store user data in localStorage for easy access
+        if (result.user) {
+          localStorage.setItem('user', JSON.stringify(result.user));
+        }
+        // Trigger navigation update and redirect
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        }
+        setTimeout(() => {
+          navigate('/diet-input');
+        }, 1000);
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearForm = () => {
+    setUsername('');
+    setEmail('');
+    setPassword('');
+    setError('');
+    setSuccess('');
   };
 
   return (
     <div className="page-container">
       <div className="page-header">
-        <h2>Welcome Back</h2>
-        <p>Sign in to access your personalized meal plans</p>
+        <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
+        <p>{isLogin ? 'Sign in to access your personalized meal plans' : 'Join SmartMeals to start your healthy journey'}</p>
       </div>
-      <form onSubmit={handleLogin}>
+      
+      {error && (
+        <div className="alert alert-error">
+          {error}
+        </div>
+      )}
+      
+      {success && (
+        <div className="alert alert-success">
+          {success}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="form-label">Username</label>
           <input
@@ -82,8 +414,24 @@ function LoginPage() {
             onChange={(e) => setUsername(e.target.value)}
             className="form-input"
             placeholder="Enter your username"
+            required
           />
         </div>
+        
+        {!isLogin && (
+          <div className="form-group">
+            <label className="form-label">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="form-input"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+        )}
+        
         <div className="form-group">
           <label className="form-label">Password</label>
           <input
@@ -92,12 +440,35 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="form-input"
             placeholder="Enter your password"
+            required
+            minLength={6}
           />
         </div>
-        <button type="submit" className="btn btn-primary btn-full">
-          Sign In
+        
+        <button 
+          type="submit" 
+          className="btn btn-primary btn-full"
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Create Account')}
         </button>
       </form>
+
+      <div className="auth-switch">
+        <p>
+          {isLogin ? "Don't have an account? " : "Already have an account? "}
+          <button 
+            type="button" 
+            className="btn-link"
+            onClick={() => {
+              setIsLogin(!isLogin);
+              clearForm();
+            }}
+          >
+            {isLogin ? 'Sign up' : 'Sign in'}
+          </button>
+        </p>
+      </div>
     </div>
   );
 }
@@ -159,6 +530,30 @@ function DietInputForm() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [useMetric, setUseMetric] = useState(true);
+  const [usHeight, setUsHeight] = useState({ feet: '', inches: '' });
+  const [usWeight, setUsWeight] = useState('');
+
+  // Convert US units to metric for API
+  const convertToMetric = () => {
+    let height = formData.height;
+    let weight = formData.weight;
+
+    if (!useMetric) {
+      // Convert feet/inches to cm
+      if (usHeight.feet && usHeight.inches) {
+        const totalInches = parseInt(usHeight.feet) * 12 + parseInt(usHeight.inches);
+        height = Math.round(totalInches * 2.54);
+      }
+      
+      // Convert pounds to kg
+      if (usWeight) {
+        weight = Math.round(parseFloat(usWeight) * 0.453592);
+      }
+    }
+
+    return { height: height.toString(), weight: weight.toString() };
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -166,9 +561,46 @@ function DietInputForm() {
     setError('');
     
     try {
-      const mealPlan = await generateMealPlan(formData);
+      // Convert to metric if using US units
+      const metricData = convertToMetric();
+      const dataToSave = {
+        ...formData,
+        height: metricData.height,
+        weight: metricData.weight
+      };
+
+      // Save diet input data to user account
+      const saveResponse = await fetch(`${BACKEND_URL}/api/user/data/diet_input`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(dataToSave)
+      });
+
+      if (!saveResponse.ok) {
+        console.error('Failed to save diet input data');
+      }
+
+      const mealPlan = await generateMealPlan(dataToSave);
       console.log('Generated meal plan:', mealPlan);
       console.log('First meal details:', mealPlan.meals?.[0]);
+      
+      // Save meal plan to user account
+      const mealPlanResponse = await fetch(`${BACKEND_URL}/api/user/data/meal_plans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify([mealPlan])
+      });
+
+      if (!mealPlanResponse.ok) {
+        console.error('Failed to save meal plan');
+      }
+
       localStorage.setItem('currentMealPlan', JSON.stringify(mealPlan));
       navigate('/meal-plan');
     } catch (err) {
@@ -186,27 +618,92 @@ function DietInputForm() {
       </div>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label className="form-label">Height (cm)</label>
-          <input
-            type="number"
-            value={formData.height}
-            onChange={(e) => setFormData({...formData, height: e.target.value})}
-            className="form-input"
-            placeholder="e.g. 175"
-            required
-          />
+          <label className="form-label">Units</label>
+          <div className="unit-toggle">
+            <button
+              type="button"
+              className={`unit-btn ${useMetric ? 'active' : ''}`}
+              onClick={() => setUseMetric(true)}
+            >
+              Metric (cm/kg)
+            </button>
+            <button
+              type="button"
+              className={`unit-btn ${!useMetric ? 'active' : ''}`}
+              onClick={() => setUseMetric(false)}
+            >
+              US (ft/in, lbs)
+            </button>
+          </div>
         </div>
-        <div className="form-group">
-          <label className="form-label">Weight (kg)</label>
-          <input
-            type="number"
-            value={formData.weight}
-            onChange={(e) => setFormData({...formData, weight: e.target.value})}
-            className="form-input"
-            placeholder="e.g. 70"
-            required
-          />
-        </div>
+
+        {useMetric ? (
+          <>
+            <div className="form-group">
+              <label className="form-label">Height (cm)</label>
+              <input
+                type="number"
+                value={formData.height}
+                onChange={(e) => setFormData({...formData, height: e.target.value})}
+                className="form-input"
+                placeholder="e.g. 175"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Weight (kg)</label>
+              <input
+                type="number"
+                value={formData.weight}
+                onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                className="form-input"
+                placeholder="e.g. 70"
+                required
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="form-group">
+              <label className="form-label">Height</label>
+              <div className="height-inputs">
+                <input
+                  type="number"
+                  value={usHeight.feet}
+                  onChange={(e) => setUsHeight({...usHeight, feet: e.target.value})}
+                  className="form-input"
+                  placeholder="5"
+                  min="0"
+                  max="8"
+                  required
+                />
+                <span className="unit-label">ft</span>
+                <input
+                  type="number"
+                  value={usHeight.inches}
+                  onChange={(e) => setUsHeight({...usHeight, inches: e.target.value})}
+                  className="form-input"
+                  placeholder="8"
+                  min="0"
+                  max="11"
+                  required
+                />
+                <span className="unit-label">in</span>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Weight (lbs)</label>
+              <input
+                type="number"
+                value={usWeight}
+                onChange={(e) => setUsWeight(e.target.value)}
+                className="form-input"
+                placeholder="e.g. 150"
+                required
+              />
+            </div>
+          </>
+        )}
         <div className="form-group">
           <label className="form-label">Goal</label>
           <select
@@ -924,118 +1421,616 @@ function MealPlanPage() {
   );
 }
 
-// Google login button
-function GoogleAuthButton({ onLogin }) {
-  const clientId = '85533172291-16pfu8d6lhntu38t21v1vm38lk5q76jc.apps.googleusercontent.com';
+// Local Calendar Component (no Google API dependency)
+function LocalCalendar() {
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    console.log('Initializing calendar with date:', now.toDateString());
+    return now;
+  });
+  const [events, setEvents] = useState([]);
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [showAddMealPlan, setShowAddMealPlan] = useState(false);
+  const [newEvent, setNewEvent] = useState({ 
+    title: '', 
+    time: '12:00', 
+    type: 'breakfast',
+    calories: '',
+    protein: '',
+    carbs: '',
+    fat: '',
+    ingredients: ''
+  });
+  const [nutritionLoading, setNutritionLoading] = useState(false);
+  const [mealPlan, setMealPlan] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(null);
 
+  // Load meal plan from localStorage
   useEffect(() => {
-    function start() {
-      gapi.client.init({
-        clientId,
-        scope: 'https://www.googleapis.com/auth/calendar.events',
-      });
+    const storedMealPlan = localStorage.getItem('currentMealPlan');
+    if (storedMealPlan) {
+      setMealPlan(JSON.parse(storedMealPlan));
     }
-    gapi.load('client:auth2', start);
   }, []);
 
-  const handleLogin = () => {
-    const authInstance = gapi.auth2.getAuthInstance();
-    authInstance.signIn().then(googleUser => {
-      const token = googleUser.getAuthResponse().access_token;
-      console.log('Google access token:', token);
-      onLogin(token);
-    });
+  // Load user data (calendar events, etc.)
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        console.log('Loading calendar events...');
+        const response = await fetch(`${BACKEND_URL}/api/user/data/calendar_events`, {
+          credentials: 'include'
+        });
+        
+        console.log('Calendar events response status:', response.status);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Loaded calendar events:', data);
+          if (data.calendar_events) {
+            setEvents(data.calendar_events);
+            console.log('Set events to:', data.calendar_events);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    };
+
+    loadUserData();
+  }, []);
+
+  // Get current week dates
+  const getWeekDates = () => {
+    // Get the current date
+    const currentDate = new Date(selectedDate);
+    
+    // Find the start of the week (Sunday)
+    const startOfWeek = new Date(currentDate);
+    const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    startOfWeek.setDate(currentDate.getDate() - dayOfWeek);
+    
+    // Generate the week dates
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      weekDates.push(date);
+    }
+    
+    console.log('Selected date:', selectedDate.toDateString());
+    console.log('Day of week:', dayOfWeek);
+    console.log('Start of week:', startOfWeek.toDateString());
+    console.log('Week dates:', weekDates.map(d => d.toDateString()));
+    return weekDates;
   };
 
+  const addEvent = async () => {
+    console.log('addEvent called with:', { title: newEvent.title, selectedDay });
+    if (!newEvent.title.trim() || !selectedDay) {
+      console.log('Validation failed - title or selectedDay missing');
+      return;
+    }
+    
+    const event = {
+      id: Date.now(),
+      title: newEvent.title,
+      time: newEvent.time,
+      type: newEvent.type,
+      date: selectedDay.toISOString().split('T')[0],
+      calories: parseFloat(newEvent.calories) || 0,
+      protein: parseFloat(newEvent.protein) || 0,
+      carbs: parseFloat(newEvent.carbs) || 0,
+      fat: parseFloat(newEvent.fat) || 0
+    };
+    
+    const updatedEvents = [...events, event];
+    console.log('Adding event:', event);
+    console.log('Updated events array:', updatedEvents);
+    setEvents(updatedEvents);
+    
+    // Save events to user account
+    try {
+      console.log('Saving calendar events to backend...');
+      const response = await fetch(`${BACKEND_URL}/api/user/data/calendar_events`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updatedEvents)
+      });
+
+      console.log('Save response status:', response.status);
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Save successful:', result);
+      } else {
+        console.error('Failed to save calendar events');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error details:', errorData);
+      }
+    } catch (error) {
+      console.error('Error saving calendar events:', error);
+    }
+    
+    setNewEvent({ 
+      title: '', 
+      time: '12:00', 
+      type: 'breakfast',
+      calories: '',
+      protein: '',
+      carbs: '',
+      fat: '',
+      ingredients: ''
+    });
+    setShowAddEvent(false);
+    setSelectedDay(null);
+  };
+
+  const estimateNutrition = async () => {
+    if (!newEvent.title.trim() || !newEvent.ingredients.trim()) {
+      alert('Please enter both meal title and ingredients for nutrition estimation.');
+      return;
+    }
+
+    setNutritionLoading(true);
+    try {
+      console.log('Sending nutrition estimation request:', {
+        title: newEvent.title,
+        ingredients: newEvent.ingredients
+      });
+
+      const response = await fetch(`${BACKEND_URL}/api/estimate-nutrition`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: newEvent.title,
+          ingredients: newEvent.ingredients
+        })
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Backend error:', errorData);
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Nutrition estimation response:', data);
+
+      setNewEvent({
+        ...newEvent,
+        calories: data.calories?.toString() || '',
+        protein: data.protein?.toString() || '',
+        carbs: data.carbs?.toString() || '',
+        fat: data.fat?.toString() || ''
+      });
+
+      // Show success message
+      alert(`Nutrition estimated successfully! Source: ${data.source || 'Unknown'}`);
+    } catch (error) {
+      console.error('Nutrition estimation error:', error);
+      alert(`Could not estimate nutrition: ${error.message}. Please enter values manually.`);
+    } finally {
+      setNutritionLoading(false);
+    }
+  };
+
+  const addMealPlanToDate = () => {
+    if (!mealPlan || !mealPlan.meals || !selectedDay) return;
+    
+    const dateStr = selectedDay.toISOString().split('T')[0];
+    const mealPlanEvents = mealPlan.meals.map((meal, index) => ({
+      id: Date.now() + index,
+      title: meal.title,
+      time: getMealTime(meal.type),
+      type: meal.type,
+      date: dateStr,
+      calories: meal.calories || 0,
+      protein: meal.protein || 0,
+      carbs: meal.carbs || 0,
+      fat: meal.fat || 0,
+      image: meal.image,
+      isFromMealPlan: true
+    }));
+    
+    const updatedEvents = [...events, ...mealPlanEvents];
+    setEvents(updatedEvents);
+    
+    // Save updated events
+    fetch(`${BACKEND_URL}/api/user/data/calendar_events`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(updatedEvents)
+    }).catch(error => {
+      console.error('Error saving meal plan events:', error);
+    });
+    
+    setShowAddMealPlan(false);
+    setSelectedDay(null);
+  };
+
+  const getMealTime = (mealType) => {
+    switch (mealType) {
+      case 'breakfast': return '08:00';
+      case 'lunch': return '12:00';
+      case 'dinner': return '18:00';
+      default: return '12:00';
+    }
+  };
+
+  const removeEvent = async (eventId) => {
+    const updatedEvents = events.filter(event => event.id !== eventId);
+    setEvents(updatedEvents);
+    
+    // Save updated events to user account
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/user/data/calendar_events`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updatedEvents)
+      });
+
+      if (!response.ok) {
+        console.error('Failed to save updated calendar events');
+      }
+    } catch (error) {
+      console.error('Error saving updated calendar events:', error);
+    }
+  };
+
+  const getEventsForDate = (date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return events.filter(event => event.date === dateStr);
+  };
+
+  const getDailyNutrition = (date) => {
+    const dayEvents = getEventsForDate(date);
+    return dayEvents.reduce((total, event) => ({
+      calories: total.calories + (event.calories || 0),
+      protein: total.protein + (event.protein || 0),
+      carbs: total.carbs + (event.carbs || 0),
+      fat: total.fat + (event.fat || 0)
+    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+  };
+
+  const weekDates = getWeekDates();
+  
+  // Debug current date
+  const currentDate = new Date();
+  console.log('Current date:', currentDate.toDateString());
+  console.log('Current date day of week:', currentDate.getDay()); // 0 = Sunday, 1 = Monday, etc.
+
   return (
-    <button onClick={handleLogin} className="login-button">
-      Login with Google Calendar
-    </button>
+    <div className="local-calendar">
+      <div className="calendar-header">
+        <button 
+          onClick={() => setSelectedDate(new Date(selectedDate.getTime() - 7 * 24 * 60 * 60 * 1000))}
+          className="btn btn-secondary"
+        >
+          ← Previous Week
+        </button>
+        <h3>Week of {weekDates[0].toLocaleDateString()} - {weekDates[6].toLocaleDateString()}</h3>
+        <button 
+          onClick={() => setSelectedDate(new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000))}
+          className="btn btn-secondary"
+        >
+          Next Week →
+        </button>
+      </div>
+
+      <div className="calendar-grid">
+        {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
+          <div key={day} className="calendar-day-header">
+            {day}
+          </div>
+        ))}
+        
+        {weekDates.map((date, index) => {
+          const dayEvents = getEventsForDate(date);
+          const dailyNutrition = getDailyNutrition(date);
+          const isSelected = selectedDay && selectedDay.toDateString() === date.toDateString();
+          const isToday = date.toDateString() === currentDate.toDateString();
+          
+          console.log(`Rendering day ${index}:`, date.toDateString(), 'isToday:', isToday, 'isSelected:', isSelected);
+          
+          return (
+            <div 
+              key={index} 
+              className={`calendar-day ${isSelected ? 'selected-day' : ''} ${isToday ? 'today' : ''}`}
+              onClick={() => {
+                console.log('Day clicked:', date);
+                setSelectedDay(date);
+              }}
+            >
+              <div className="date-header">
+                <span className="date-number">{date.getDate()}</span>
+                {isToday && <span className="today-indicator">Today</span>}
+                {isSelected && <span className="selected-indicator">✓</span>}
+              </div>
+              
+              {/* Daily Nutrition Summary */}
+              {dailyNutrition.calories > 0 && (
+                <div className="daily-nutrition">
+                  <div className="nutrition-item">
+                    <span className="nutrition-label">Cal:</span>
+                    <span className="nutrition-value">{Math.round(dailyNutrition.calories)}</span>
+                  </div>
+                  <div className="nutrition-item">
+                    <span className="nutrition-label">P:</span>
+                    <span className="nutrition-value">{Math.round(dailyNutrition.protein)}g</span>
+                  </div>
+                  <div className="nutrition-item">
+                    <span className="nutrition-label">C:</span>
+                    <span className="nutrition-value">{Math.round(dailyNutrition.carbs)}g</span>
+                  </div>
+                  <div className="nutrition-item">
+                    <span className="nutrition-label">F:</span>
+                    <span className="nutrition-value">{Math.round(dailyNutrition.fat)}g</span>
+                  </div>
+                </div>
+              )}
+              
+              <div className="day-events">
+                {dayEvents.map(event => (
+                  <div key={event.id} className={`calendar-event ${event.isFromMealPlan ? 'meal-plan-event' : ''}`}>
+                    {event.image && (
+                      <img src={event.image} alt={event.title} className="event-image" />
+                    )}
+                    <div className="event-details">
+                      <span className="event-time">{event.time}</span>
+                      <span className="event-title">{event.title}</span>
+                      <span className="event-type">{event.type}</span>
+                      {event.calories > 0 && (
+                        <span className="event-calories">{Math.round(event.calories)} cal</span>
+                      )}
+                    </div>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeEvent(event.id);
+                      }}
+                      className="remove-event"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="calendar-actions">
+        <div className="selected-date-info">
+          {selectedDay ? (
+            <span className="selected-date-text">
+              Selected: {selectedDay.toLocaleDateString()}
+            </span>
+          ) : (
+            <span className="no-date-selected">
+              Click on a date to select it
+            </span>
+          )}
+        </div>
+        
+        <div className="action-buttons">
+          <button 
+            onClick={() => {
+              console.log('Add Custom Meal button clicked!');
+              if (!selectedDay) {
+                console.log('No day selected, cannot open modal');
+                return;
+              }
+              setShowAddEvent(true);
+            }}
+            className="btn btn-primary"
+            disabled={!selectedDay}
+          >
+            Add Custom Meal
+          </button>
+          {mealPlan && mealPlan.meals && (
+            <button 
+              onClick={() => setShowAddMealPlan(true)}
+              className="btn btn-success"
+              disabled={!selectedDay}
+              style={{ marginLeft: '1rem' }}
+            >
+              Add Meal Plan to Selected Date
+            </button>
+          )}
+        </div>
+      </div>
+
+      {showAddEvent && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Add Custom Meal to Calendar</h3>
+            
+            <div className="form-group">
+              <label htmlFor="meal-title">Meal Title:</label>
+              <input
+                id="meal-title"
+                name="meal-title"
+                type="text"
+                value={newEvent.title}
+                onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                placeholder="e.g., Grilled Chicken Salad"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="meal-time">Time:</label>
+              <input
+                id="meal-time"
+                name="meal-time"
+                type="time"
+                value={newEvent.time}
+                onChange={(e) => setNewEvent({...newEvent, time: e.target.value})}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="meal-type">Meal Type:</label>
+              <select
+                id="meal-type"
+                name="meal-type"
+                value={newEvent.type}
+                onChange={(e) => setNewEvent({...newEvent, type: e.target.value})}
+              >
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="snack">Snack</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="meal-ingredients">Ingredients (for nutrition estimation):</label>
+              <textarea
+                id="meal-ingredients"
+                name="meal-ingredients"
+                value={newEvent.ingredients}
+                onChange={(e) => setNewEvent({...newEvent, ingredients: e.target.value})}
+                placeholder="e.g., chicken breast, rice, broccoli, olive oil"
+                rows="3"
+                style={{ resize: 'vertical' }}
+              />
+              <small style={{ color: '#6c757d', fontSize: '0.875rem' }}>
+                List main ingredients to help estimate nutrition values
+              </small>
+            </div>
+
+            <div className="nutrition-section">
+              <div className="nutrition-header">
+                <h4>Nutrition Information</h4>
+                <button 
+                  onClick={estimateNutrition}
+                  disabled={nutritionLoading || !newEvent.title.trim() || !newEvent.ingredients.trim()}
+                  className="btn btn-secondary btn-sm"
+                >
+                  {nutritionLoading ? 'Estimating...' : 'Auto-Estimate'}
+                </button>
+              </div>
+              
+              <div className="nutrition-grid">
+                <div className="form-group">
+                  <label htmlFor="meal-calories">Calories:</label>
+                  <input
+                    id="meal-calories"
+                    name="meal-calories"
+                    type="number"
+                    value={newEvent.calories}
+                    onChange={(e) => setNewEvent({...newEvent, calories: e.target.value})}
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="meal-protein">Protein (g):</label>
+                  <input
+                    id="meal-protein"
+                    name="meal-protein"
+                    type="number"
+                    value={newEvent.protein}
+                    onChange={(e) => setNewEvent({...newEvent, protein: e.target.value})}
+                    placeholder="0"
+                    min="0"
+                    step="0.1"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="meal-carbs">Carbs (g):</label>
+                  <input
+                    id="meal-carbs"
+                    name="meal-carbs"
+                    type="number"
+                    value={newEvent.carbs}
+                    onChange={(e) => setNewEvent({...newEvent, carbs: e.target.value})}
+                    placeholder="0"
+                    min="0"
+                    step="0.1"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="meal-fat">Fat (g):</label>
+                  <input
+                    id="meal-fat"
+                    name="meal-fat"
+                    type="number"
+                    value={newEvent.fat}
+                    onChange={(e) => setNewEvent({...newEvent, fat: e.target.value})}
+                    placeholder="0"
+                    min="0"
+                    step="0.1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button onClick={addEvent} className="btn btn-primary">Add Meal</button>
+              <button onClick={() => setShowAddEvent(false)} className="btn btn-secondary">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAddMealPlan && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Add Meal Plan to Calendar</h3>
+            <p style={{ marginBottom: '1rem', color: '#6c757d' }}>
+              Add your current meal plan to {selectedDay?.toLocaleDateString()}?
+            </p>
+            
+            {mealPlan && mealPlan.meals && (
+              <div className="meal-plan-preview">
+                <h4>Meals to be added:</h4>
+                {mealPlan.meals.map((meal, index) => (
+                  <div key={index} className="meal-preview-item">
+                    <img src={meal.image} alt={meal.title} className="meal-preview-image" />
+                    <div className="meal-preview-details">
+                      <div className="meal-preview-title">{meal.title}</div>
+                      <div className="meal-preview-info">
+                        {meal.type} • {Math.round(meal.calories)} cal • {getMealTime(meal.type)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <div className="modal-actions">
+              <button onClick={addMealPlanToDate} className="btn btn-success">Add Meal Plan</button>
+              <button onClick={() => setShowAddMealPlan(false)} className="btn btn-secondary">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
 // Main calendar page
 function CalendarPage() {
-  const [accessToken, setAccessToken] = useState(null);
-  const [events, setEvents] = useState([]);
-
-  const addMealToGoogleCalendar = async () => {
-    if (!accessToken) {
-      alert('Please log in first!');
-      return;
-    }
-
-    const event = {
-      summary: 'Grilled Chicken Salad',
-      description: 'Lunch meal from your plan',
-      start: {
-        dateTime: '2025-08-06T12:00:00-04:00',
-        timeZone: 'America/New_York',
-      },
-      end: {
-        dateTime: '2025-08-06T13:00:00-04:00',
-        timeZone: 'America/New_York',
-      },
-    };
-
-    try {
-      const response = await fetch(
-        'https://www.googleapis.com/calendar/v3/calendars/primary/events',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(event),
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to add event');
-      alert('Meal added to calendar!');
-      // Refresh events after adding
-      fetchEvents();
-    } catch (error) {
-      console.error('Add event error:', error);
-      alert('Failed to add meal: ' + error.message);
-    }
-  };
-
-  const fetchEvents = async () => {
-    try {
-      const response = await fetch(
-        'https://www.googleapis.com/calendar/v3/calendars/primary/events?orderBy=startTime&singleEvents=true',
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch calendar events');
-      const data = await response.json();
-      console.log('Fetched calendar events:', data.items);
-      setEvents(data.items);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (accessToken) fetchEvents();
-  }, [accessToken]);
-
-  const groupEventsByDate = (events) =>
-    events.reduce((acc, event) => {
-      const date = event.start?.dateTime?.split('T')[0] || event.start?.date;
-      if (!date) return acc;
-      if (!acc[date]) acc[date] = [];
-      acc[date].push(event);
-      return acc;
-    }, {});
-
-  const groupedEvents = groupEventsByDate(events);
-
   return (
     <div className="page-container">
       <div className="page-header">
@@ -1043,34 +2038,16 @@ function CalendarPage() {
         <p>View your meal plan in a calendar format</p>
       </div>
 
-      <GoogleAuthButton onLogin={setAccessToken} />
-
-      <button onClick={addMealToGoogleCalendar} disabled={!accessToken}>
-        Add Meal to Google Calendar
-      </button>
-
-      <div className="events-list">
-        {events.length === 0 ? (
-          <p>No calendar events found.</p>
-        ) : (
-          <div>
-            {Object.keys(groupedEvents).map((date) => (
-              <div key={date}>
-                <h4>{date}</h4>
-                <ul>
-                  {groupedEvents[date].map((event) => (
-                    <li key={event.id}>
-                      <strong>{event.summary || '(No title)'}</strong> <br />
-                      {event.start?.dateTime || event.start?.date} -{' '}
-                      {event.end?.dateTime || event.end?.date}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        )}
+      <div className="calendar-info">
+        <div className="calendar-status connected">
+          ✅ Local Calendar Ready
+        </div>
+        <p style={{ margin: '1rem 0', color: '#6c757d' }}>
+          Add meals to your weekly calendar. You can navigate between weeks and manage your meal schedule.
+        </p>
       </div>
+
+      <LocalCalendar />
     </div>
   );
 }
@@ -1415,20 +2392,43 @@ function RecommendationsPage() {
 
 
 function App() {
+  const [authUpdate, setAuthUpdate] = useState(0);
+
+  const triggerAuthUpdate = () => {
+    setAuthUpdate(prev => prev + 1);
+  };
+
   return (
     <Router>
       <div>
-        <Navigation />
+        <Navigation key={authUpdate} />
         <div className="main-content">
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/diet-input" element={<DietInputForm />} />
-            <Route path="/meal-plan" element={<MealPlanPage />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/recommendations" element={<RecommendationsPage />} />
+            <Route path="/login" element={<LoginPage onLoginSuccess={triggerAuthUpdate} />} />
+            <Route path="/diet-input" element={
+              <ProtectedRoute>
+                <DietInputForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/meal-plan" element={
+              <ProtectedRoute>
+                <MealPlanPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/calendar" element={
+              <ProtectedRoute>
+                <CalendarPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/recommendations" element={
+              <ProtectedRoute>
+                <RecommendationsPage />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </div>
+        <Chatbot />
       </div>
     </Router>
   );

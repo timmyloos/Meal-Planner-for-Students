@@ -1,0 +1,873 @@
+{
+  "users": {
+    "3165a070-a4da-4331-bf6e-96ccfe78b3d9": {
+      "id": "3165a070-a4da-4331-bf6e-96ccfe78b3d9",
+      "username": "timmyloos",
+      "email": "timmyloos04@gmail.com",
+      "password_hash": "28c54de6eeecec18b6046ead505ea59e83d78b2003a2a458d474ad88992bfe2a",
+      "created_at": "2025-08-12T15:37:46.479160",
+      "diet_input": {
+        "height": "178",
+        "weight": "82",
+        "goal": "maintain",
+        "restrictions": "vegetarian ",
+        "foods": ""
+      },
+      "meal_plans": [
+        {
+          "daily_calories": 1807,
+          "goal": "maintain",
+          "meals": [
+            {
+              "calories": 148.29,
+              "carbs": 34.2,
+              "cuisines": [],
+              "diets": [
+                "lacto ovo vegetarian"
+              ],
+              "equipment": [
+                {
+                  "name": "Bowl"
+                },
+                {
+                  "name": "Spoon"
+                }
+              ],
+              "fat": 0.76,
+              "healthScore": 0,
+              "image": "https://img.spoonacular.com/recipes/775666-312x231.jpg",
+              "ingredients": [
+                {
+                  "aisle": "Baking",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 20081,
+                  "image": "flour.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 125,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "cup",
+                      "unitShort": "cup"
+                    }
+                  },
+                  "meta": [],
+                  "name": "all purpose flour",
+                  "nameClean": "all purpose flour",
+                  "original": "1 cup all purpose flour",
+                  "originalName": "all purpose flour",
+                  "unit": "cup"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 9003,
+                  "image": "apple.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 125,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "cup",
+                      "unitShort": "cup"
+                    }
+                  },
+                  "meta": [
+                    "chopped"
+                  ],
+                  "name": "apple",
+                  "nameClean": "apple",
+                  "original": "1 cup chopped apple",
+                  "originalName": "chopped apple",
+                  "unit": "cup"
+                },
+                {
+                  "aisle": "Baking",
+                  "amount": 1.5,
+                  "consistency": "SOLID",
+                  "id": 18369,
+                  "image": "white-powder.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 1.5,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    },
+                    "us": {
+                      "amount": 1.5,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    }
+                  },
+                  "meta": [],
+                  "name": "baking powder",
+                  "nameClean": "baking powder",
+                  "original": "1 1/2 teaspoons baking powder",
+                  "originalName": "baking powder",
+                  "unit": "teaspoons"
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 2010,
+                  "image": "cinnamon.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "teaspoon",
+                      "unitShort": "tsp"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "teaspoon",
+                      "unitShort": "tsp"
+                    }
+                  },
+                  "meta": [],
+                  "name": "cinnamon",
+                  "nameClean": "cinnamon",
+                  "original": "1 teaspoon cinnamon",
+                  "originalName": "cinnamon",
+                  "unit": "teaspoon"
+                },
+                {
+                  "aisle": "Milk, Eggs, Other Dairy",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 1123,
+                  "image": "egg.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "",
+                      "unitShort": ""
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "",
+                      "unitShort": ""
+                    }
+                  },
+                  "meta": [],
+                  "name": "egg",
+                  "nameClean": "egg",
+                  "original": "1 egg",
+                  "originalName": "egg",
+                  "unit": ""
+                },
+                {
+                  "aisle": "Milk, Eggs, Other Dairy",
+                  "amount": 0.33333334,
+                  "consistency": "LIQUID",
+                  "id": 1077,
+                  "image": "milk.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 81.333,
+                      "unitLong": "milliliters",
+                      "unitShort": "ml"
+                    },
+                    "us": {
+                      "amount": 0.33333334,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [],
+                  "name": "milk",
+                  "nameClean": "milk",
+                  "original": "1/3 cup milk",
+                  "originalName": "milk",
+                  "unit": "cup"
+                },
+                {
+                  "aisle": "Milk, Eggs, Other Dairy",
+                  "amount": 1.5,
+                  "consistency": "LIQUID",
+                  "id": 1077,
+                  "image": "milk.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 1.5,
+                      "unitLong": "Tbsps",
+                      "unitShort": "Tbsps"
+                    },
+                    "us": {
+                      "amount": 1.5,
+                      "unitLong": "Tbsps",
+                      "unitShort": "Tbsps"
+                    }
+                  },
+                  "meta": [],
+                  "name": "milk",
+                  "nameClean": "milk",
+                  "original": "1 1/2 tablespoons milk",
+                  "originalName": "milk",
+                  "unit": "tablespoons"
+                },
+                {
+                  "aisle": "Baking",
+                  "amount": 2,
+                  "consistency": "SOLID",
+                  "id": 19336,
+                  "image": "powdered-sugar.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 240,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 2,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [],
+                  "name": "powdered sugar",
+                  "nameClean": "powdered sugar",
+                  "original": "2 cups powdered sugar",
+                  "originalName": "powdered sugar",
+                  "unit": "cups"
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 0.75,
+                  "consistency": "SOLID",
+                  "id": 2047,
+                  "image": "salt.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 0.75,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    },
+                    "us": {
+                      "amount": 0.75,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    }
+                  },
+                  "meta": [],
+                  "name": "salt",
+                  "nameClean": "salt",
+                  "original": "3/4 teaspoon salt",
+                  "originalName": "salt",
+                  "unit": "teaspoon"
+                },
+                {
+                  "aisle": "Baking",
+                  "amount": 0.25,
+                  "consistency": "SOLID",
+                  "id": 19335,
+                  "image": "sugar-in-bowl.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 50,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 0.25,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [],
+                  "name": "sugar",
+                  "nameClean": "sugar",
+                  "original": "1/4 cup sugar",
+                  "originalName": "sugar",
+                  "unit": "cup"
+                }
+              ],
+              "instructions": "<p>Combine flour, sugar, salt, baking powder, cinnamon. Stir in milk and egg until just combined. Fold in apple. Pour oil into skillet so that it is approximately 1 1/2 deep. Heat oil on high. Oil is ready when a little dough thrown in floats to top. Carefully add dough to oil in heaping teaspoons. Cook until brown, about 2 minutes, then flip. Cook another 1-2 minutes, until both sides are browned. Transfer briefly to paper towels to absorb excess oil, then transfer to cooling rack. Make glaze by stirring milk and powdered sugar together in a small bowl. Drizzle over apple fritters. Wait approximately 3 minutes for glaze to harden, then flip fritters and drizzle glaze over the other side. Best served warm.</p>",
+              "pricePerServing": 16.09,
+              "protein": 1.86,
+              "readyInMinutes": 30,
+              "servings": 12,
+              "sourceName": "recipeoftoday.com",
+              "sourceUrl": "https://www.recipeoftoday.com/2015/05/easy-homemade-apple-fritters.html?m=1",
+              "spoonacularScore": 14.519948959350586,
+              "summary": "Easy Homemade Apple Fritters might be just the breakfast you are searching for. One portion of this dish contains approximately <b>2g of protein</b>, <b>1g of fat</b>, and a total of <b>148 calories</b>. This recipe serves 12 and costs 16 cents per serving. If you have egg, apple, sugar, and a few other ingredients on hand, you can make it. 1334 people were impressed by this recipe. It is brought to you by recipe-of-today.blogspot.com. From preparation to the plate, this recipe takes around <b>30 minutes</b>. It is a good option if you're following a <b>lacto ovo vegetarian</b> diet. Taking all factors into account, this recipe <b>earns a spoonacular score of 26%</b>, which is rather bad. Try <a href=\"https://spoonacular.com/recipes/easy-gluten-free-apple-fritters-1138722\">Easy Gluten Free Apple Fritters</a>, <a href=\"https://spoonacular.com/recipes/easy-homemade-apple-sauce-676445\">Easy Homemade Apple Sauce</a>, and <a href=\"https://spoonacular.com/recipes/easy-homemade-apple-oat-muesli-506904\">Easy Homemade Apple & Oat Muesli</a> for similar recipes.",
+              "title": "Easy Homemade Apple Fritters",
+              "type": "breakfast"
+            },
+            {
+              "calories": 445.69,
+              "carbs": 86.11,
+              "cuisines": [],
+              "diets": [
+                "gluten free",
+                "dairy free",
+                "lacto ovo vegetarian",
+                "vegan"
+              ],
+              "equipment": [
+                {
+                  "name": "Pot"
+                }
+              ],
+              "fat": 4.09,
+              "healthScore": 60,
+              "image": "https://img.spoonacular.com/recipes/716627-312x231.jpg",
+              "ingredients": [
+                {
+                  "aisle": "Canned and Jarred",
+                  "amount": 15,
+                  "consistency": "SOLID",
+                  "id": 16018,
+                  "image": "black-beans.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 425.243,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 15,
+                      "unitLong": "ounces",
+                      "unitShort": "oz"
+                    }
+                  },
+                  "meta": [
+                    "drained",
+                    "canned"
+                  ],
+                  "name": "black beans",
+                  "nameClean": "black beans",
+                  "original": "1 15-ounce can black beans, not drained",
+                  "originalName": "black beans, not drained",
+                  "unit": "ounce"
+                },
+                {
+                  "aisle": "Canned and Jarred",
+                  "amount": 10,
+                  "consistency": "SOLID",
+                  "id": 10011693,
+                  "image": "tomatoes-canned.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 283.495,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 10,
+                      "unitLong": "ounces",
+                      "unitShort": "oz"
+                    }
+                  },
+                  "meta": [
+                    "diced",
+                    "with  green chilies, not drained",
+                    "canned"
+                  ],
+                  "name": "canned tomatoes",
+                  "nameClean": "canned tomatoes",
+                  "original": "1 10-ounce can Rotel tomatoes with diced green chilies, not drained",
+                  "originalName": "Rotel tomatoes with diced green chilies, not drained",
+                  "unit": "ounce"
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 2,
+                  "consistency": "SOLID",
+                  "id": 2009,
+                  "image": "chili-powder.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 2,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    },
+                    "us": {
+                      "amount": 2,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    }
+                  },
+                  "meta": [],
+                  "name": "chili powder",
+                  "nameClean": "chili powder",
+                  "original": "2 tsp chili powder",
+                  "originalName": "chili powder",
+                  "unit": "tsp"
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 0.5,
+                  "consistency": "SOLID",
+                  "id": 1002014,
+                  "image": "ground-cumin.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 0.5,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    },
+                    "us": {
+                      "amount": 0.5,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    }
+                  },
+                  "meta": [],
+                  "name": "cumin",
+                  "nameClean": "cumin",
+                  "original": "1/2 tsp cumin",
+                  "originalName": "cumin",
+                  "unit": "tsp"
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 0.25,
+                  "consistency": "SOLID",
+                  "id": 1002030,
+                  "image": "pepper.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 0.25,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    },
+                    "us": {
+                      "amount": 0.25,
+                      "unitLong": "teaspoons",
+                      "unitShort": "tsps"
+                    }
+                  },
+                  "meta": [
+                    "black"
+                  ],
+                  "name": "ground pepper",
+                  "nameClean": "ground pepper",
+                  "original": "1/4 tsp ground black pepper",
+                  "originalName": "ground black pepper",
+                  "unit": "tsp"
+                },
+                {
+                  "aisle": "Condiments",
+                  "amount": 4,
+                  "consistency": "LIQUID",
+                  "id": 6168,
+                  "image": "hot-sauce-or-tabasco.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 4,
+                      "unitLong": "dashes",
+                      "unitShort": "dashes"
+                    },
+                    "us": {
+                      "amount": 4,
+                      "unitLong": "dashes",
+                      "unitShort": "dashes"
+                    }
+                  },
+                  "meta": [],
+                  "name": "optional: of hot sauce",
+                  "nameClean": "optional: of hot sauce",
+                  "original": "optional: 4-5 dashes of hot sauce",
+                  "originalName": "optional: of hot sauce",
+                  "unit": "dashes"
+                },
+                {
+                  "aisle": "Oil, Vinegar, Salad Dressing",
+                  "amount": 1,
+                  "consistency": "LIQUID",
+                  "id": 4053,
+                  "image": "olive-oil.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "teaspoon",
+                      "unitShort": "tsp"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "teaspoon",
+                      "unitShort": "tsp"
+                    }
+                  },
+                  "meta": [],
+                  "name": "olive oil",
+                  "nameClean": "olive oil",
+                  "original": "1 tsp olive oil",
+                  "originalName": "olive oil",
+                  "unit": "tsp"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 0.25,
+                  "consistency": "SOLID",
+                  "id": 11282,
+                  "image": "brown-onion.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 40,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 0.25,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [
+                    "chopped"
+                  ],
+                  "name": "onion",
+                  "nameClean": "onion",
+                  "original": "1/4 cup onion, chopped",
+                  "originalName": "onion, chopped",
+                  "unit": "cup"
+                },
+                {
+                  "aisle": "Pasta and Rice",
+                  "amount": 0.5,
+                  "consistency": "SOLID",
+                  "id": 20444,
+                  "image": "uncooked-white-rice.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 92.5,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 0.5,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [
+                    "uncooked"
+                  ],
+                  "name": "rice",
+                  "nameClean": "rice",
+                  "original": "1/2 cup uncooked rice",
+                  "originalName": "uncooked rice",
+                  "unit": "cup"
+                },
+                {
+                  "aisle": "Beverages",
+                  "amount": 3,
+                  "consistency": "LIQUID",
+                  "id": 14412,
+                  "image": "water.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
+                      "unitLong": "Tbsps",
+                      "unitShort": "Tbsps"
+                    },
+                    "us": {
+                      "amount": 3,
+                      "unitLong": "Tbsps",
+                      "unitShort": "Tbsps"
+                    }
+                  },
+                  "meta": [],
+                  "name": "water",
+                  "nameClean": "water",
+                  "original": "3 Tbsp water",
+                  "originalName": "water",
+                  "unit": "Tbsp"
+                }
+              ],
+              "instructions": "<p>Heat the olive oil in a large pot over medium heat. Add onions and saute until soft, or for about 5 minutes. Add all other remaining ingredients and stir together. Increase the heat to medium high and bring to a boil. Cover and reduce heat to medium low so that the mixture simmers. Cook for 15-20 minutes, or until rice is fluffy and liquid is absorbed.* Serve with salsa, cheese, and sour cream.</p>",
+              "pricePerServing": 106.02,
+              "protein": 19.14,
+              "readyInMinutes": 35,
+              "servings": 2,
+              "sourceName": "blogspot.com",
+              "sourceUrl": "http://cooking2perfection.blogspot.com/2012/11/easy-homemade-rice-and-beans.html",
+              "spoonacularScore": 98.625,
+              "summary": "Easy Homemade Rice and Beans is a main course that serves 2. One serving contains <b>446 calories</b>, <b>19g of protein</b>, and <b>4g of fat</b>. For <b>$1.06 per serving</b>, this recipe <b>covers 26%</b> of your daily requirements of vitamins and minerals. A mixture of optional: of hot sauce, canned tomatoes, water, and a handful of other ingredients are all it takes to make this recipe so yummy. This recipe from cooking2perfection.blogspot.com has 471 fans. It is a good option if you're following a <b>gluten free, dairy free, lacto ovo vegetarian, and vegan</b> diet. From preparation to the plate, this recipe takes around <b>35 minutes</b>. Overall, this recipe earns a <b>tremendous spoonacular score of 98%</b>. <a href=\"https://spoonacular.com/recipes/easy-homemade-rice-and-beans-1311839\">Easy Homemade Rice and Beans</a>, <a href=\"https://spoonacular.com/recipes/easy-homemade-rice-and-beans-1303021\">Easy Homemade Rice and Beans</a>, and <a href=\"https://spoonacular.com/recipes/easy-homemade-rice-and-beans-1230117\">Easy Homemade Rice and Beans</a> are very similar to this recipe.",
+              "title": "Easy Homemade Rice and Beans",
+              "type": "lunch"
+            },
+            {
+              "calories": 779.52,
+              "carbs": 86.31,
+              "cuisines": [
+                "American"
+              ],
+              "diets": [
+                "lacto ovo vegetarian"
+              ],
+              "equipment": [
+                {
+                  "name": "Oven"
+                },
+                {
+                  "name": "Bowl"
+                }
+              ],
+              "fat": 35.24,
+              "healthScore": 14,
+              "image": "https://img.spoonacular.com/recipes/715595-312x231.jpg",
+              "ingredients": [
+                {
+                  "aisle": "Pasta and Rice",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 10120420,
+                  "image": "farfalle.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "package",
+                      "unitShort": "pkg"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "package",
+                      "unitShort": "pkg"
+                    }
+                  },
+                  "meta": [],
+                  "name": "bowtie pasta cook as directed",
+                  "nameClean": "bowtie pasta cook as directed",
+                  "original": "1 package of Bowtie pasta cook as directed",
+                  "originalName": "Bowtie pasta cook as directed",
+                  "unit": "package"
+                },
+                {
+                  "aisle": "Cheese",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 1021009,
+                  "image": "cheddar-cheese.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 113,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "cup",
+                      "unitShort": "cup"
+                    }
+                  },
+                  "meta": [],
+                  "name": "extra sharp cheddar cheese",
+                  "nameClean": "extra sharp cheddar cheese",
+                  "original": "1 cup Extra Sharp Cheddar cheese",
+                  "originalName": "Extra Sharp Cheddar cheese",
+                  "unit": "cup"
+                },
+                {
+                  "aisle": "Cheese",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 1021009,
+                  "image": "cheddar-cheese.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 113,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "cup",
+                      "unitShort": "cup"
+                    }
+                  },
+                  "meta": [
+                    "white"
+                  ],
+                  "name": "extra sharp cheddar cheese",
+                  "nameClean": "extra sharp cheddar cheese",
+                  "original": "1 cup Extra Sharp White Cheddar cheese",
+                  "originalName": "Extra Sharp White Cheddar cheese",
+                  "unit": "cup"
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 1102047,
+                  "image": "salt-and-pepper.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "teaspoon",
+                      "unitShort": "tsp"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "teaspoon",
+                      "unitShort": "tsp"
+                    }
+                  },
+                  "meta": [],
+                  "name": "salt and pepper",
+                  "nameClean": "salt and pepper",
+                  "original": "1 tsp salt and pepper",
+                  "originalName": "salt and pepper",
+                  "unit": "tsp"
+                },
+                {
+                  "aisle": "Milk, Eggs, Other Dairy",
+                  "amount": 0.25,
+                  "consistency": "SOLID",
+                  "id": 1056,
+                  "image": "sour-cream.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 57.5,
+                      "unitLong": "milliliters",
+                      "unitShort": "ml"
+                    },
+                    "us": {
+                      "amount": 0.25,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [
+                    "sour"
+                  ],
+                  "name": "cream",
+                  "nameClean": "cream",
+                  "original": "1/4 cup sour cream",
+                  "originalName": "sour cream",
+                  "unit": "cup"
+                },
+                {
+                  "aisle": "Milk, Eggs, Other Dairy",
+                  "amount": 0.25,
+                  "consistency": "SOLID",
+                  "id": 1145,
+                  "image": "butter-sliced.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 56.75,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 0.25,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [
+                    "unsalted",
+                    "room temperature"
+                  ],
+                  "name": "butter",
+                  "nameClean": "butter",
+                  "original": "1/4 cup unsalted butter room temperature",
+                  "originalName": "unsalted butter room temperature",
+                  "unit": "cup"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 4,
+                  "consistency": "SOLID",
+                  "id": 10511297,
+                  "image": "parsley.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 4,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    },
+                    "us": {
+                      "amount": 4,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    }
+                  },
+                  "meta": [
+                    "fresh",
+                    "for garnish"
+                  ],
+                  "name": "parsley",
+                  "nameClean": "parsley",
+                  "original": "Fresh Parsley for garnish",
+                  "originalName": "Fresh Parsley for garnish",
+                  "unit": "servings"
+                }
+              ],
+              "instructions": "Instructions\n\nStep 1: Heat your oven to 350 degrees Fahrenheit, and then cook your pasta as directed. Drain.\n\nStep 2: Shred the cheese. Add cooked noodles, cheese, sour cream, salt and pepper, and butter to a medium mixing bowl and stir until combined.\n\nStep 3: Add to a 9 x 13 prepared casserole dish, top with extra cheese if desired, and bake for 20 minutes.\n\nStep 4: Remove from oven and serve hot.",
+              "pricePerServing": 134.61,
+              "protein": 28.42,
+              "readyInMinutes": 35,
+              "servings": 4,
+              "sourceName": "pinkwhen.com",
+              "sourceUrl": "https://www.pinkwhen.com/mac-and-cheese-recipe/",
+              "spoonacularScore": 78.34317779541016,
+              "summary": "How to Make the Cheesiest Bowtie Mac and Cheese might be just the main course you are searching for. This recipe serves 4 and costs $1.35 per serving. One portion of this dish contains roughly <b>28g of protein</b>, <b>35g of fat</b>, and a total of <b>780 calories</b>. It is a good option if you're following a <b>lacto ovo vegetarian</b> diet. From preparation to the plate, this recipe takes around <b>35 minutes</b>. If you have salt and pepper, butter, extra sharp cheddar cheese, and a few other ingredients on hand, you can make it. This recipe is typical of American cuisine. It is brought to you by Pink When. 402 people found this recipe to be tasty and satisfying. Taking all factors into account, this recipe <b>earns a spoonacular score of 69%</b>, which is solid. Users who liked this recipe also liked <a href=\"https://spoonacular.com/recipes/how-to-make-the-cheesiest-bowtie-mac-and-cheese-1527865\">How to Make the Cheesiest Bowtie Mac and Cheese</a>, <a href=\"https://spoonacular.com/recipes/cheesiest-bowtie-mac-and-cheese-1367377\">Cheesiest Bowtie Mac and Cheese</a>, and <a href=\"https://spoonacular.com/recipes/the-cheesiest-spinach-and-cheese-lasagna-1524533\">The Cheesiest Spinach and Cheese Lasagna</a>.",
+              "title": "How to Make the Cheesiest Bowtie Mac and Cheese",
+              "type": "dinner"
+            }
+          ],
+          "user_preferences": {
+            "foods": "",
+            "height": 178,
+            "restrictions": "vegetarian ",
+            "weight": 82
+          }
+        }
+      ],
+      "calendar_events": [
+        {
+          "calories": 126.12,
+          "carbs": 4.83,
+          "date": "2025-08-12",
+          "fat": 7.7,
+          "id": 1755038429368,
+          "image": "https://img.spoonacular.com/recipes/1017374-312x231.jpg",
+          "isFromMealPlan": true,
+          "protein": 9.23,
+          "time": "08:00",
+          "title": "Easy Weekday Breakfast Muffins",
+          "type": "breakfast"
+        },
+        {
+          "calories": 916.27,
+          "carbs": 47.21,
+          "date": "2025-08-12",
+          "fat": 74.14,
+          "id": 1755038429369,
+          "image": "https://img.spoonacular.com/recipes/1697785-312x231.jpg",
+          "isFromMealPlan": true,
+          "protein": 16.68,
+          "time": "12:00",
+          "title": "How to Upgrade a Simple BLT to Your Favorite Summer Lunch with These 2 Simple Tricks",
+          "type": "lunch"
+        },
+        {
+          "calories": 1131.83,
+          "carbs": 84.45,
+          "date": "2025-08-12",
+          "fat": 61.13,
+          "id": 1755038429370,
+          "image": "https://img.spoonacular.com/recipes/665261-312x231.jpg",
+          "isFromMealPlan": true,
+          "protein": 72.45,
+          "time": "18:00",
+          "title": "Whole Chicken Dinner",
+          "type": "dinner"
+        }
+      ],
+      "recommendations": [],
+      "preferences": {}
+    }
+  }
+}

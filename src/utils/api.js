@@ -119,4 +119,27 @@ export async function generateMealRecommendations(userPreferences) {
   }
 }
 
+// Estimate nutrition for custom meals
+export async function estimateNutrition(mealData) {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/estimate-nutrition`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(mealData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error estimating nutrition:', error);
+    throw new Error('Failed to estimate nutrition: ' + error.message);
+  }
+}
+
 

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 import requests
 import os
@@ -7,11 +7,95 @@ from datetime import datetime
 from functools import wraps
 from pathlib import Path
 import google.generativeai as genai
+import hashlib
+import uuid
+import json
 
 # Load .env from the project root (two directories up from backend)
 load_dotenv('../../.env')
 app = Flask(__name__)
-CORS(app)
+app.secret_key = 'your-secret-key-change-in-production'  # For session management
+CORS(app, supports_credentials=True)
+
+# User management functions
+
+
+def load_users():
+    """Load users from JSON file"""
+    try:
+        with open('users.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"users": {}}
+
+
+def save_users(users_data):
+    """Save users to JSON file"""
+    with open('users.json', 'w') as f:
+        json.dump(users_data, f, indent=2)
+
+
+def hash_password(password):
+    """Hash password using SHA-256"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
+def create_user(username, email, password):
+    """Create a new user account"""
+    users_data = load_users()
+
+    # Check if username or email already exists
+    for user_id, user in users_data['users'].items():
+        if user['username'] == username:
+            return False, "Username already exists"
+        if user['email'] == email:
+            return False, "Email already exists"
+
+    # Create new user
+    user_id = str(uuid.uuid4())
+    new_user = {
+        'id': user_id,
+        'username': username,
+        'email': email,
+        'password_hash': hash_password(password),
+        'created_at': datetime.now().isoformat(),
+        'diet_input': {},
+        'meal_plans': [],
+        'calendar_events': [],
+        'recommendations': [],
+        'preferences': {}
+    }
+
+    users_data['users'][user_id] = new_user
+    save_users(users_data)
+    return True, user_id
+
+
+def authenticate_user(username, password):
+    """Authenticate user login"""
+    users_data = load_users()
+
+    for user_id, user in users_data['users'].items():
+        if user['username'] == username and user['password_hash'] == hash_password(password):
+            return True, user_id, user
+    return False, None, None
+
+
+def get_user_data(user_id):
+    """Get user data by ID"""
+    users_data = load_users()
+    return users_data['users'].get(user_id)
+
+
+def update_user_data(user_id, data_type, data):
+    """Update specific user data"""
+    users_data = load_users()
+    if user_id in users_data['users']:
+        users_data['users'][user_id][data_type] = data
+        save_users(users_data)
+        return True
+    return False
+
 
 API_KEY = os.getenv('VITE_SPOONACULAR_API_KEY')
 GEMINI_API_KEY = os.getenv('VITE_GEMINI_API_KEY')
@@ -28,6 +112,8 @@ user_preferences = []
 user_food_preferences = []
 
 # Error handling for API requests
+
+
 def handle_errors(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -38,22 +124,418 @@ def handle_errors(func):
             return jsonify({'error': str(e)}), 500
     return wrapper
 
+# Authentication endpoints
+
+
+@app.route('/api/auth/signup', methods=['POST'])
+@handle_errors
+def signup():
+    """User registration endpoint"""
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    username = data.get('username', '').strip()
+    email = data.get('email', '').strip()
+    password = data.get('password', '')
+
+    if not username or not email or not password:
+        return jsonify({'error': 'Username, email, and password are required'}), 400
+
+    if len(password) < 6:
+        return jsonify({'error': 'Password must be at least 6 characters'}), 400
+
+    success, result = create_user(username, email, password)
+
+    if success:
+        return jsonify({
+            'message': 'Account created successfully',
+            'user_id': result
+        }), 201
+    else:
+        return jsonify({'error': result}), 400
+
+
+@app.route('/api/auth/login', methods=['POST'])
+@handle_errors
+def login():
+    """User login endpoint"""
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    username = data.get('username', '').strip()
+    password = data.get('password', '')
+
+    if not username or not password:
+        return jsonify({'error': 'Username and password are required'}), 400
+
+    success, user_id, user_data = authenticate_user(username, password)
+
+    if success:
+        session['user_id'] = user_id
+        return jsonify({
+            'message': 'Login successful',
+            'user': {
+                'id': user_id,
+                'username': user_data['username'],
+                'email': user_data['email']
+            }
+        }), 200
+    else:
+        return jsonify({'error': 'Invalid username or password'}), 401
+
+
+@app.route('/api/auth/logout', methods=['POST'])
+@handle_errors
+def logout():
+    """User logout endpoint"""
+    session.pop('user_id', None)
+    return jsonify({'message': 'Logout successful'}), 200
+
+
+@app.route('/api/auth/check', methods=['GET'])
+@handle_errors
+def check_auth():
+    """Check if user is authenticated"""
+    user_id = session.get('user_id')
+    if user_id:
+        user_data = get_user_data(user_id)
+        if user_data:
+            return jsonify({
+                'authenticated': True,
+                'user': {
+                    'id': user_id,
+                    'username': user_data['username'],
+                    'email': user_data['email']
+                }
+            }), 200
+
+    return jsonify({'authenticated': False}), 401
+
+# User data endpoints
+
+
+@app.route('/api/user/data/<data_type>', methods=['GET'])
+@handle_errors
+def get_user_data_endpoint(data_type):
+    """Get user data by type"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Not authenticated'}), 401
+
+    print(f"Getting {data_type} for user {user_id}")
+
+    user_data = get_user_data(user_id)
+    if not user_data:
+        print(f"User {user_id} not found")
+        return jsonify({'error': 'User not found'}), 404
+
+    if data_type not in user_data:
+        print(f"Data type {data_type} not found for user {user_id}")
+        return jsonify({'error': 'Data type not found'}), 404
+
+    print(f"Returning {data_type}: {user_data[data_type]}")
+    return jsonify({data_type: user_data[data_type]}), 200
+
+
+@app.route('/api/user/data/<data_type>', methods=['POST'])
+@handle_errors
+def save_user_data_endpoint(data_type):
+    """Save user data by type"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Not authenticated'}), 401
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    print(f"Saving {data_type} for user {user_id}")
+    print(f"Data to save: {data}")
+
+    success = update_user_data(user_id, data_type, data)
+    if success:
+        print(f"Successfully saved {data_type}")
+        return jsonify({'message': f'{data_type} saved successfully'}), 200
+    else:
+        print(f"Failed to save {data_type}")
+        return jsonify({'error': 'Failed to save data'}), 500
+
 # generate recommendations using Google Gemini
+
+
+@app.route('/api/estimate-nutrition', methods=['POST'])
+@handle_errors
+def estimate_nutrition():
+    print("Received nutrition estimation request")
+    data = request.get_json()
+    print(f"Request data: {data}")
+
+    if not data:
+        print("No data provided")
+        return jsonify({'error': 'No data provided'}), 400
+
+    title = data.get('title', '')
+    ingredients = data.get('ingredients', '')
+    print(f"Title: {title}, Ingredients: {ingredients}")
+
+    if not title or not ingredients:
+        print("Missing title or ingredients")
+        return jsonify({'error': 'Title and ingredients are required'}), 400
+
+    try:
+        # First try to get nutrition from Spoonacular by analyzing ingredients
+        if API_KEY:
+            print(f"Analyzing ingredients: {ingredients}")
+
+            # Split ingredients and analyze each one
+            ingredient_list = [ingredient.strip().lower()
+                               for ingredient in ingredients.split(',')]
+            total_calories = 0
+            total_protein = 0
+            total_carbs = 0
+            total_fat = 0
+            analyzed_ingredients = 0
+
+            for ingredient in ingredient_list:
+                try:
+                    # Search for the specific ingredient
+                    ingredient_response = requests.get(f'{BASE_URL}/food/ingredients/search', params={
+                        'query': ingredient,
+                        'number': 1,
+                        'apiKey': API_KEY
+                    })
+
+                    if ingredient_response.ok:
+                        ingredient_data = ingredient_response.json()
+                        if ingredient_data.get('results'):
+                            ingredient_id = ingredient_data['results'][0]['id']
+
+                            # Get nutrition for this ingredient
+                            nutrition_response = requests.get(f'{BASE_URL}/food/ingredients/{ingredient_id}/information', params={
+                                'amount': 100,  # 100g serving
+                                'unit': 'g',
+                                'apiKey': API_KEY
+                            })
+
+                            if nutrition_response.ok:
+                                nutrition_data = nutrition_response.json()
+                                nutrients = nutrition_data.get(
+                                    'nutrition', {}).get('nutrients', [])
+
+                                calories = next(
+                                    (n for n in nutrients if n['name'] == 'Calories'), None)
+                                protein = next(
+                                    (n for n in nutrients if n['name'] == 'Protein'), None)
+                                carbs = next(
+                                    (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
+                                fat = next(
+                                    (n for n in nutrients if n['name'] == 'Total Lipid (g)'), None)
+
+                                if calories and protein:
+                                    total_calories += calories['amount']
+                                    total_protein += protein['amount']
+                                    total_carbs += carbs['amount'] if carbs else 0
+                                    total_fat += fat['amount'] if fat else 0
+                                    analyzed_ingredients += 1
+                                    print(
+                                        f"Analyzed {ingredient}: {calories['amount']} cal, {protein['amount']}g protein")
+
+                except Exception as e:
+                    print(f"Error analyzing ingredient {ingredient}: {e}")
+                    continue
+
+            # If we successfully analyzed ingredients, return the totals
+            if analyzed_ingredients > 0:
+                # Adjust for typical serving size (divide by number of ingredients for rough estimate)
+                # At least 1 serving
+                serving_factor = max(1, analyzed_ingredients)
+
+                return jsonify({
+                    'calories': round(total_calories / serving_factor),
+                    'protein': round(total_protein / serving_factor, 1),
+                    'carbs': round(total_carbs / serving_factor, 1),
+                    'fat': round(total_fat / serving_factor, 1),
+                    'source': f'Spoonacular (analyzed {analyzed_ingredients} ingredients)'
+                })
+
+            # Fallback: try recipe search if ingredient analysis failed
+            print(f"Falling back to recipe search with title: {title}")
+            search_response = requests.get(f'{BASE_URL}/recipes/complexSearch', params={
+                'query': title,
+                'number': 1,
+                'addRecipeNutrition': True,
+                'apiKey': API_KEY
+            })
+
+            print(
+                f"Spoonacular response status: {search_response.status_code}")
+            if search_response.ok:
+                search_data = search_response.json()
+                if search_data.get('results'):
+                    recipe = search_data['results'][0]
+                    nutrition = recipe.get('nutrition', {})
+                    nutrients = nutrition.get('nutrients', [])
+
+                    calories = next(
+                        (n for n in nutrients if n['name'] == 'Calories'), None)
+                    protein = next(
+                        (n for n in nutrients if n['name'] == 'Protein'), None)
+                    carbs = next(
+                        (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
+                    fat = next(
+                        (n for n in nutrients if n['name'] == 'Fat'), None)
+
+                    return jsonify({
+                        'calories': calories['amount'] if calories else 0,
+                        'protein': protein['amount'] if protein else 0,
+                        'carbs': carbs['amount'] if carbs else 0,
+                        'fat': fat['amount'] if fat else 0,
+                        'source': 'Spoonacular (recipe search)'
+                    })
+
+        # Fallback to Gemini AI estimation
+        if GEMINI_API_KEY:
+            print("Trying Gemini AI estimation")
+            model = genai.GenerativeModel('gemini-1.5-flash')
+
+            prompt = f"""
+Estimate the nutritional content for this meal based on the ingredients provided.
+
+Meal Title: {title}
+Ingredients: {ingredients}
+
+Please provide estimated nutritional values for a typical serving size. Return only a JSON object with these exact keys:
+{{
+    "calories": <estimated calories>,
+    "protein": <estimated protein in grams>,
+    "carbs": <estimated carbohydrates in grams>,
+    "fat": <estimated fat in grams>
+}}
+
+Provide realistic estimates based on common nutritional values for the ingredients listed. Round to reasonable numbers.
+"""
+
+            response = model.generate_content(prompt)
+
+            try:
+                # Try to parse the response as JSON
+                import json
+                result = json.loads(response.text)
+                return jsonify({
+                    'calories': result.get('calories', 0),
+                    'protein': result.get('protein', 0),
+                    'carbs': result.get('carbs', 0),
+                    'fat': result.get('fat', 0),
+                    'source': 'Gemini AI'
+                })
+            except json.JSONDecodeError:
+                # If JSON parsing fails, try to extract numbers from text
+                import re
+                text = response.text
+                calories_match = re.search(
+                    r'calories?[:\s]*(\d+)', text, re.IGNORECASE)
+                protein_match = re.search(
+                    r'protein[:\s]*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+                carbs_match = re.search(
+                    r'carbs?[:\s]*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+                fat_match = re.search(
+                    r'fat[:\s]*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+
+                return jsonify({
+                    'calories': float(calories_match.group(1)) if calories_match else 0,
+                    'protein': float(protein_match.group(1)) if protein_match else 0,
+                    'carbs': float(carbs_match.group(1)) if carbs_match else 0,
+                    'fat': float(fat_match.group(1)) if fat_match else 0,
+                    'source': 'Gemini AI (parsed)'
+                })
+
+        # If no APIs available, return basic estimation
+        print("Using default estimation")
+        return jsonify({
+            'calories': 300,
+            'protein': 15,
+            'carbs': 30,
+            'fat': 10,
+            'source': 'Default estimation'
+        })
+
+    except Exception as e:
+        print(f"Nutrition estimation error: {e}")
+        return jsonify({'error': f'Failed to estimate nutrition: {str(e)}'}), 500
+
+
+@app.route('/api/chatbot', methods=['POST'])
+@handle_errors
+def chatbot():
+    """Chatbot endpoint using Gemini AI for nutrition and meal planning assistance"""
+    data = request.get_json()
+
+    if not data or 'message' not in data:
+        return jsonify({'error': 'Message is required'}), 400
+
+    user_message = data['message']
+    print(f"Chatbot request: {user_message}")
+
+    if not GEMINI_API_KEY:
+        return jsonify({
+            'response': "I'm sorry, but I'm not available right now. Please check back later or contact support."
+        })
+
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash')
+
+        # Create a context-aware prompt for nutrition assistance
+        prompt = f"""
+You are a helpful nutrition assistant for a meal planning app. The user is asking: "{user_message}"
+
+Please provide a helpful, informative response about nutrition, meal planning, healthy eating, or general food advice. 
+
+Guidelines:
+- Keep responses conversational and friendly
+- Provide practical, actionable advice
+- Include specific examples when helpful
+- Focus on evidence-based nutrition information
+- Keep responses concise but informative (2-4 sentences)
+- If asked about specific foods, mention their nutritional benefits
+- If asked about meal planning, provide practical tips
+- If asked about dietary restrictions, be supportive and helpful
+
+Respond in a helpful, conversational tone as if you're a friendly nutrition expert.
+"""
+
+        response = model.generate_content(prompt)
+        print(f"Chatbot response generated successfully")
+
+        return jsonify({
+            'response': response.text.strip()
+        })
+
+    except Exception as e:
+        print(f"Chatbot error: {e}")
+        return jsonify({
+            'response': "I'm having trouble processing your request right now. Please try again in a moment!"
+        })
+
+
 @app.route('/api/generate-recommendations', methods=['POST'])
 @handle_errors
 def generate_recommendations():
     data = request.get_json()
     if not data:
         return jsonify({'error': 'No data provided'}), 400
-    
+
     if not GEMINI_API_KEY:
         return jsonify({'error': 'Google Gemini API key not configured'}), 500
-    
+
     try:
-        # get user prefrences 
+        # get user prefrences
         user_prefs = data.get('userPreferences', {})
 
-        # promt format 
+        # promt format
         if user_prefs.get('currentMeals'):
             current_meals_text = "\n".join([
                 f"- {meal.get('type', 'Unknown')}: {meal.get('title', 'Unknown')} "
@@ -64,8 +546,9 @@ def generate_recommendations():
         else:
             current_meals_text = "No current meal plan available"
 
-        recent_recipes_text = ', '.join(user_prefs.get('recentRecipes', [])) if user_prefs.get('recentRecipes') else 'No recent recipes available'
-        
+        recent_recipes_text = ', '.join(user_prefs.get('recentRecipes', [])) if user_prefs.get(
+            'recentRecipes') else 'No recent recipes available'
+
         prompt = f"""
 I need personalized meal recommendations based on my dietary profile and current meal plan. Here are my details:
 Personal Information:
@@ -96,19 +579,19 @@ Based on this information, please provide:
 
 Please provide specific, actionable advice that I can implement immediately. Focus on practical suggestions rather than generic advice.
         """
-        
+
         # Try different model names in order of preference
         model_names = [
-            'gemini-1.5-flash',      
-            'gemini-1.5-pro',       
-            'gemini-pro',            
-            'models/gemini-pro',     
-            'models/gemini-1.5-flash' 
+            'gemini-1.5-flash',
+            'gemini-1.5-pro',
+            'gemini-pro',
+            'models/gemini-pro',
+            'models/gemini-1.5-flash'
         ]
-        
+
         response = None
         used_model = None
-        
+
         for model_name in model_names:
             try:
                 model = genai.GenerativeModel(model_name)
@@ -117,10 +600,10 @@ Please provide specific, actionable advice that I can implement immediately. Foc
                 break
             except Exception as model_error:
                 continue
-        
+
         if not response:
             return jsonify({'error': 'No available AI models found. Please check your API key permissions.'}), 500
-        
+
         if response.text:
             return jsonify({
                 'recommendations': response.text,
@@ -129,11 +612,13 @@ Please provide specific, actionable advice that I can implement immediately. Foc
             })
         else:
             return jsonify({'error': 'No recommendations generated by AI'}), 500
-            
+
     except Exception as e:
         return jsonify({'error': f'Failed to generate recommendations: {str(e)}'}), 500
 
 # log user food preferences
+
+
 @app.route('/api/log-user-foods', methods=['POST'])
 @handle_errors
 def log_user_foods():
@@ -162,6 +647,8 @@ def log_user_foods():
     }), 201
 
 # get all logged food preferences
+
+
 @app.route('/api/user-food-preferences', methods=['GET'])
 def get_user_food_preferences():
     return jsonify({
@@ -170,6 +657,8 @@ def get_user_food_preferences():
     })
 
 # Spoonacular API request
+
+
 def make_api_request(endpoint, params=None):
     if params is None:
         params = {}
@@ -220,7 +709,8 @@ def search_recipes():
         return jsonify(response.json())
     except requests.RequestException as e:
         return jsonify({'error': str(e)}), 500
-        
+
+
 @app.route('/api/generate-meal-plan', methods=['POST'])
 def generate_meal_plan():
     print("Received request for meal plan generation")
@@ -259,278 +749,301 @@ def generate_meal_plan():
         daily_calories = 2000  # default
 
     try:
-        # Search for breakfast recipes
-        breakfast_response = requests.get(
-            f'{BASE_URL}/recipes/complexSearch',
-            params={
-                'query': 'breakfast',
-                'number': 1,
-                'addRecipeNutrition': True,
-                'maxReadyTime': 30,
-                'apiKey': API_KEY
-            }
-        )
+        # Parse dietary restrictions and food preferences
+        restrictions = restrictions.lower() if restrictions else ''
+        foods = foods.lower() if foods else ''
+
+        # Build search parameters based on restrictions and preferences
+        search_params = {
+            'addRecipeNutrition': True,
+            'number': 3,  # Get 3 options per meal type
+            'apiKey': API_KEY
+        }
+
+        # Add dietary restrictions
+        if 'vegetarian' in restrictions:
+            search_params['diet'] = 'vegetarian'
+        elif 'vegan' in restrictions:
+            search_params['diet'] = 'vegan'
+        elif 'gluten-free' in restrictions or 'gluten free' in restrictions:
+            search_params['diet'] = 'gluten-free'
+        elif 'dairy-free' in restrictions or 'dairy free' in restrictions:
+            search_params['diet'] = 'dairy-free'
+        elif 'keto' in restrictions:
+            search_params['diet'] = 'ketogenic'
+        elif 'paleo' in restrictions:
+            search_params['diet'] = 'paleo'
+
+        # Add food preferences to search query
+        if foods:
+            # Extract first few ingredients for search
+            food_list = [f.strip() for f in foods.split(',')[:3]]
+            search_params['includeIngredients'] = ','.join(food_list)
+
+        # Add additional search parameters for better results
+        search_params['sort'] = 'popularity'  # Get popular recipes
+        search_params['sortDirection'] = 'desc'
+
+        # Add intolerance filters if specified
+        intolerances = []
+        if 'gluten' in restrictions:
+            intolerances.append('gluten')
+        if 'dairy' in restrictions:
+            intolerances.append('dairy')
+        if 'nuts' in restrictions or 'peanut' in restrictions:
+            intolerances.append('tree nut')
+        if 'shellfish' in restrictions:
+            intolerances.append('shellfish')
+        if 'soy' in restrictions:
+            intolerances.append('soy')
+        if 'egg' in restrictions:
+            intolerances.append('egg')
+        if 'fish' in restrictions:
+            intolerances.append('fish')
+
+        if intolerances:
+            search_params['intolerances'] = ','.join(intolerances)
+
+        print(f"Search parameters: {search_params}")
+
+        # Search for breakfast recipes with variety
+        breakfast_queries = ['breakfast', 'morning meal',
+                             'eggs', 'pancakes', 'oatmeal']
+        breakfast_params = {**search_params, 'maxReadyTime': 30}
+
+        breakfast_response = None
+        for query in breakfast_queries:
+            breakfast_params['query'] = query
+            breakfast_response = requests.get(
+                f'{BASE_URL}/recipes/complexSearch',
+                params=breakfast_params
+            )
+            if breakfast_response.ok and breakfast_response.json().get('results'):
+                print(f"Breakfast found with query '{query}'")
+                break
+
+        if not breakfast_response or not breakfast_response.ok:
+            # Fallback to basic breakfast search
+            breakfast_params['query'] = 'breakfast'
+            breakfast_response = requests.get(
+                f'{BASE_URL}/recipes/complexSearch',
+                params=breakfast_params
+            )
+
         print(
-            f"Breakfast API Response Status: {breakfast_response.status_code}")
+            f"Breakfast API Response Status: {breakfast_response.status_code if breakfast_response else 'No response'}")
 
-        # Search for lunch recipes
-        lunch_response = requests.get(
-            f'{BASE_URL}/recipes/complexSearch',
-            params={
-                'query': 'lunch',
-                'number': 1,
-                'addRecipeNutrition': True,
-                'maxReadyTime': 45,
-                'apiKey': API_KEY
-            }
-        )
-        print(f"Lunch API Response Status: {lunch_response.status_code}")
+        # Search for lunch recipes with variety
+        lunch_queries = ['lunch', 'sandwich', 'salad', 'soup', 'pasta']
+        lunch_params = {**search_params, 'maxReadyTime': 45}
 
-        # Search for dinner recipes
-        dinner_response = requests.get(
-            f'{BASE_URL}/recipes/complexSearch',
-            params={
-                'query': 'dinner',
-                'number': 1,
-                'addRecipeNutrition': True,
-                'maxReadyTime': 60,
-                'apiKey': API_KEY
-            }
-        )
-        print(f"Dinner API Response Status: {dinner_response.status_code}")
+        lunch_response = None
+        for query in lunch_queries:
+            lunch_params['query'] = query
+            lunch_response = requests.get(
+                f'{BASE_URL}/recipes/complexSearch',
+                params=lunch_params
+            )
+            if lunch_response.ok and lunch_response.json().get('results'):
+                print(f"Lunch found with query '{query}'")
+                break
+
+        if not lunch_response or not lunch_response.ok:
+            # Fallback to basic lunch search
+            lunch_params['query'] = 'lunch'
+            lunch_response = requests.get(
+                f'{BASE_URL}/recipes/complexSearch',
+                params=lunch_params
+            )
+
+        print(
+            f"Lunch API Response Status: {lunch_response.status_code if lunch_response else 'No response'}")
+
+        # Search for dinner recipes with variety
+        dinner_queries = ['dinner', 'main course',
+                          'chicken', 'beef', 'fish', 'vegetarian main']
+        dinner_params = {**search_params, 'maxReadyTime': 60}
+
+        dinner_response = None
+        for query in dinner_queries:
+            dinner_params['query'] = query
+            dinner_response = requests.get(
+                f'{BASE_URL}/recipes/complexSearch',
+                params=dinner_params
+            )
+            if dinner_response.ok and dinner_response.json().get('results'):
+                print(f"Dinner found with query '{query}'")
+                break
+
+        if not dinner_response or not dinner_response.ok:
+            # Fallback to basic dinner search
+            dinner_params['query'] = 'dinner'
+            dinner_response = requests.get(
+                f'{BASE_URL}/recipes/complexSearch',
+                params=dinner_params
+            )
+
+        print(
+            f"Dinner API Response Status: {dinner_response.status_code if dinner_response else 'No response'}")
 
         enhanced_meals = []
+        used_recipe_ids = set()  # Track used recipe IDs to avoid duplicates
+
+        def process_meal_response(response, meal_type):
+            """Process meal response and return the best meal, avoiding duplicates"""
+            if not response.ok:
+                return None
+
+            data = response.json()
+            if not data.get('results'):
+                return None
+
+            # Find the first recipe that hasn't been used yet
+            for meal in data['results']:
+                if meal['id'] not in used_recipe_ids:
+                    used_recipe_ids.add(meal['id'])  # Mark this recipe as used
+                    break
+            else:
+                # If all recipes are duplicates, use the first one but log it
+                meal = data['results'][0]
+                print(
+                    f"Warning: Using duplicate recipe for {meal_type}: {meal['title']}")
+
+            # Get detailed recipe information
+            recipe_id = meal['id']
+            detailed_response = requests.get(
+                f'{BASE_URL}/recipes/{recipe_id}/information',
+                params={'apiKey': API_KEY}
+            )
+
+            detailed_recipe = {}
+            if detailed_response.ok:
+                detailed_recipe = detailed_response.json()
+                print(
+                    f"Detailed {meal_type} recipe fetched: {detailed_recipe.get('title', 'Unknown')}")
+
+            # Try to get equipment from a different endpoint or extract from instructions
+            equipment_data = detailed_recipe.get('equipment', [])
+            if not equipment_data and detailed_recipe.get('instructions'):
+                # Extract common equipment from instructions
+                instructions = detailed_recipe.get('instructions', '').lower()
+                common_equipment = []
+
+                equipment_keywords = [
+                    'oven', 'stove', 'pan', 'pot', 'bowl', 'whisk', 'spoon', 'knife',
+                    'cutting board', 'baking sheet', 'muffin tin', 'blender', 'mixer',
+                    'food processor', 'grater', 'measuring cup', 'measuring spoon'
+                ]
+
+                for keyword in equipment_keywords:
+                    if keyword in instructions:
+                        common_equipment.append({'name': keyword.title()})
+
+                equipment_data = common_equipment
+                print(
+                    f"Extracted equipment from instructions: {len(equipment_data)} items")
+
+            # Extract nutrition information properly
+            nutrition = meal.get('nutrition', {})
+            nutrients = nutrition.get('nutrients', [])
+
+            # Find specific nutrients
+            calories = next(
+                (n for n in nutrients if n['name'] == 'Calories'), None)
+            protein = next(
+                (n for n in nutrients if n['name'] == 'Protein'), None)
+            carbs = next(
+                (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
+            fat = next((n for n in nutrients if n['name'] == 'Fat'), None)
+
+            return {
+                'type': meal_type,
+                'title': meal['title'],
+                'image': meal['image'],
+                'calories': calories['amount'] if calories else 0,
+                'protein': protein['amount'] if protein else 0,
+                'carbs': carbs['amount'] if carbs else 0,
+                'fat': fat['amount'] if fat else 0,
+                'readyInMinutes': meal.get('readyInMinutes', 0),
+                'servings': meal.get('servings', 1),
+                'instructions': detailed_recipe.get('instructions', ''),
+                'ingredients': detailed_recipe.get('extendedIngredients', []),
+                'equipment': equipment_data,
+                'summary': detailed_recipe.get('summary', ''),
+                'cuisines': meal.get('cuisines', []),
+                'diets': meal.get('diets', []),
+                'sourceUrl': detailed_recipe.get('sourceUrl', ''),
+                'sourceName': detailed_recipe.get('sourceName', ''),
+                'pricePerServing': detailed_recipe.get('pricePerServing', 0),
+                'healthScore': detailed_recipe.get('healthScore', 0),
+                'spoonacularScore': detailed_recipe.get('spoonacularScore', 0)
+            }
 
         # Process breakfast
-        if breakfast_response.ok:
-            breakfast_data = breakfast_response.json()
-            if breakfast_data.get('results'):
-                meal = breakfast_data['results'][0]
-
-                # Get detailed recipe information
-                recipe_id = meal['id']
-                detailed_response = requests.get(
-                    f'{BASE_URL}/recipes/{recipe_id}/information',
-                    params={'apiKey': API_KEY}
-                )
-
-                detailed_recipe = {}
-                if detailed_response.ok:
-                    detailed_recipe = detailed_response.json()
-                    print(
-                        f"Detailed breakfast recipe fetched: {detailed_recipe.get('title', 'Unknown')}")
-
-                # Try to get equipment from a different endpoint or extract from instructions
-                equipment_data = detailed_recipe.get('equipment', [])
-                if not equipment_data and detailed_recipe.get('instructions'):
-                    # Extract common equipment from instructions
-                    instructions = detailed_recipe.get(
-                        'instructions', '').lower()
-                    common_equipment = []
-
-                    equipment_keywords = [
-                        'oven', 'stove', 'pan', 'pot', 'bowl', 'whisk', 'spoon', 'knife',
-                        'cutting board', 'baking sheet', 'muffin tin', 'blender', 'mixer',
-                        'food processor', 'grater', 'measuring cup', 'measuring spoon'
-                    ]
-
-                    for keyword in equipment_keywords:
-                        if keyword in instructions:
-                            common_equipment.append({'name': keyword.title()})
-
-                    equipment_data = common_equipment
-                    print(
-                        f"Extracted equipment from instructions: {len(equipment_data)} items")
-
-                # Extract nutrition information properly
-                nutrition = meal.get('nutrition', {})
-                nutrients = nutrition.get('nutrients', [])
-
-                # Find specific nutrients
-                calories = next(
-                    (n for n in nutrients if n['name'] == 'Calories'), None)
-                protein = next(
-                    (n for n in nutrients if n['name'] == 'Protein'), None)
-                carbs = next(
-                    (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
-                fat = next((n for n in nutrients if n['name'] == 'Fat'), None)
-
-                enhanced_meals.append({
-                    'type': 'breakfast',
-                    'title': meal['title'],
-                    'image': meal['image'],
-                    'calories': calories['amount'] if calories else 0,
-                    'protein': protein['amount'] if protein else 0,
-                    'carbs': carbs['amount'] if carbs else 0,
-                    'fat': fat['amount'] if fat else 0,
-                    'readyInMinutes': meal.get('readyInMinutes', 0),
-                    'servings': meal.get('servings', 1),
-                    'instructions': detailed_recipe.get('instructions', ''),
-                    'ingredients': detailed_recipe.get('extendedIngredients', []),
-                    'equipment': equipment_data,
-                    'summary': detailed_recipe.get('summary', ''),
-                    'cuisines': meal.get('cuisines', []),
-                    'diets': meal.get('diets', []),
-                    'sourceUrl': detailed_recipe.get('sourceUrl', ''),
-                    'sourceName': detailed_recipe.get('sourceName', ''),
-                    'pricePerServing': detailed_recipe.get('pricePerServing', 0),
-                    'healthScore': detailed_recipe.get('healthScore', 0),
-                    'spoonacularScore': detailed_recipe.get('spoonacularScore', 0)
-                })
+        breakfast_meal = process_meal_response(breakfast_response, 'breakfast')
+        if breakfast_meal:
+            enhanced_meals.append(breakfast_meal)
 
         # Process lunch
-        if lunch_response.ok:
-            lunch_data = lunch_response.json()
-            if lunch_data.get('results'):
-                meal = lunch_data['results'][0]
-
-                # Get detailed recipe information
-                recipe_id = meal['id']
-                detailed_response = requests.get(
-                    f'{BASE_URL}/recipes/{recipe_id}/information',
-                    params={'apiKey': API_KEY}
-                )
-
-                detailed_recipe = {}
-                if detailed_response.ok:
-                    detailed_recipe = detailed_response.json()
-                    print(
-                        f"Detailed lunch recipe fetched: {detailed_recipe.get('title', 'Unknown')}")
-
-                # Try to get equipment from a different endpoint or extract from instructions
-                equipment_data = detailed_recipe.get('equipment', [])
-                if not equipment_data and detailed_recipe.get('instructions'):
-                    # Extract common equipment from instructions
-                    instructions = detailed_recipe.get(
-                        'instructions', '').lower()
-                    common_equipment = []
-
-                    equipment_keywords = [
-                        'oven', 'stove', 'pan', 'pot', 'bowl', 'whisk', 'spoon', 'knife',
-                        'cutting board', 'baking sheet', 'muffin tin', 'blender', 'mixer',
-                        'food processor', 'grater', 'measuring cup', 'measuring spoon'
-                    ]
-
-                    for keyword in equipment_keywords:
-                        if keyword in instructions:
-                            common_equipment.append({'name': keyword.title()})
-
-                    equipment_data = common_equipment
-                    print(
-                        f"Extracted equipment from instructions: {len(equipment_data)} items")
-
-                # Extract nutrition information properly
-                nutrition = meal.get('nutrition', {})
-                nutrients = nutrition.get('nutrients', [])
-
-                # Find specific nutrients
-                calories = next(
-                    (n for n in nutrients if n['name'] == 'Calories'), None)
-                protein = next(
-                    (n for n in nutrients if n['name'] == 'Protein'), None)
-                carbs = next(
-                    (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
-                fat = next((n for n in nutrients if n['name'] == 'Fat'), None)
-
-                enhanced_meals.append({
-                    'type': 'lunch',
-                    'title': meal['title'],
-                    'image': meal['image'],
-                    'calories': calories['amount'] if calories else 0,
-                    'protein': protein['amount'] if protein else 0,
-                    'carbs': carbs['amount'] if carbs else 0,
-                    'fat': fat['amount'] if fat else 0,
-                    'readyInMinutes': meal.get('readyInMinutes', 0),
-                    'servings': meal.get('servings', 1),
-                    'instructions': detailed_recipe.get('instructions', ''),
-                    'ingredients': detailed_recipe.get('extendedIngredients', []),
-                    'equipment': equipment_data,
-                    'summary': detailed_recipe.get('summary', ''),
-                    'cuisines': meal.get('cuisines', []),
-                    'diets': meal.get('diets', []),
-                    'sourceUrl': detailed_recipe.get('sourceUrl', ''),
-                    'sourceName': detailed_recipe.get('sourceName', ''),
-                    'pricePerServing': detailed_recipe.get('pricePerServing', 0),
-                    'healthScore': detailed_recipe.get('healthScore', 0),
-                    'spoonacularScore': detailed_recipe.get('spoonacularScore', 0)
-                })
+        lunch_meal = process_meal_response(lunch_response, 'lunch')
+        if lunch_meal:
+            enhanced_meals.append(lunch_meal)
 
         # Process dinner
-        if dinner_response.ok:
-            dinner_data = dinner_response.json()
-            if dinner_data.get('results'):
-                meal = dinner_data['results'][0]
+        dinner_meal = process_meal_response(dinner_response, 'dinner')
+        if dinner_meal:
+            enhanced_meals.append(dinner_meal)
 
-                # Get detailed recipe information
-                recipe_id = meal['id']
-                detailed_response = requests.get(
-                    f'{BASE_URL}/recipes/{recipe_id}/information',
-                    params={'apiKey': API_KEY}
-                )
+        # If we have duplicates, try to get alternative recipes
+        meal_titles = [meal['title'] for meal in enhanced_meals]
+        if len(meal_titles) != len(set(meal_titles)):
+            print("Detected duplicates, trying to get alternative recipes...")
 
-                detailed_recipe = {}
-                if detailed_response.ok:
-                    detailed_recipe = detailed_response.json()
-                    print(
-                        f"Detailed dinner recipe fetched: {detailed_recipe.get('title', 'Unknown')}")
+            # Try alternative searches for duplicates
+            for i, meal in enumerate(enhanced_meals):
+                if meal_titles.count(meal['title']) > 1:
+                    meal_type = meal['type']
+                    print(f"Getting alternative for {meal_type}...")
 
-                # Try to get equipment from a different endpoint or extract from instructions
-                equipment_data = detailed_recipe.get('equipment', [])
-                if not equipment_data and detailed_recipe.get('instructions'):
-                    # Extract common equipment from instructions
-                    instructions = detailed_recipe.get(
-                        'instructions', '').lower()
-                    common_equipment = []
+                    # Try different search terms for this meal type
+                    if meal_type == 'breakfast':
+                        alt_queries = ['muffins',
+                                       'cereal', 'yogurt', 'smoothie']
+                    elif meal_type == 'lunch':
+                        alt_queries = ['wrap', 'bowl', 'stir fry', 'quinoa']
+                    else:  # dinner
+                        alt_queries = ['roast', 'grill', 'bake', 'stew']
 
-                    equipment_keywords = [
-                        'oven', 'stove', 'pan', 'pot', 'bowl', 'whisk', 'spoon', 'knife',
-                        'cutting board', 'baking sheet', 'muffin tin', 'blender', 'mixer',
-                        'food processor', 'grater', 'measuring cup', 'measuring spoon'
-                    ]
+                    for alt_query in alt_queries:
+                        alt_params = {**search_params, 'query': alt_query}
+                        if meal_type == 'breakfast':
+                            alt_params['maxReadyTime'] = 30
+                        elif meal_type == 'lunch':
+                            alt_params['maxReadyTime'] = 45
+                        else:
+                            alt_params['maxReadyTime'] = 60
 
-                    for keyword in equipment_keywords:
-                        if keyword in instructions:
-                            common_equipment.append({'name': keyword.title()})
+                        alt_response = requests.get(
+                            f'{BASE_URL}/recipes/complexSearch',
+                            params=alt_params
+                        )
 
-                    equipment_data = common_equipment
-                    print(
-                        f"Extracted equipment from instructions: {len(equipment_data)} items")
-
-                # Extract nutrition information properly
-                nutrition = meal.get('nutrition', {})
-                nutrients = nutrition.get('nutrients', [])
-
-                # Find specific nutrients
-                calories = next(
-                    (n for n in nutrients if n['name'] == 'Calories'), None)
-                protein = next(
-                    (n for n in nutrients if n['name'] == 'Protein'), None)
-                carbs = next(
-                    (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
-                fat = next((n for n in nutrients if n['name'] == 'Fat'), None)
-
-                enhanced_meals.append({
-                    'type': 'dinner',
-                    'title': meal['title'],
-                    'image': meal['image'],
-                    'calories': calories['amount'] if calories else 0,
-                    'protein': protein['amount'] if protein else 0,
-                    'carbs': carbs['amount'] if carbs else 0,
-                    'fat': fat['amount'] if fat else 0,
-                    'readyInMinutes': meal.get('readyInMinutes', 0),
-                    'servings': meal.get('servings', 1),
-                    'instructions': detailed_recipe.get('instructions', ''),
-                    'ingredients': detailed_recipe.get('extendedIngredients', []),
-                    'equipment': equipment_data,
-                    'summary': detailed_recipe.get('summary', ''),
-                    'cuisines': meal.get('cuisines', []),
-                    'diets': meal.get('diets', []),
-                    'sourceUrl': detailed_recipe.get('sourceUrl', ''),
-                    'sourceName': detailed_recipe.get('sourceName', ''),
-                    'pricePerServing': detailed_recipe.get('pricePerServing', 0),
-                    'healthScore': detailed_recipe.get('healthScore', 0),
-                    'spoonacularScore': detailed_recipe.get('spoonacularScore', 0)
-                })
+                        if alt_response.ok:
+                            alt_data = alt_response.json()
+                            if alt_data.get('results'):
+                                # Find first unused recipe
+                                for alt_meal in alt_data['results']:
+                                    if alt_meal['id'] not in used_recipe_ids:
+                                        # Process this alternative meal
+                                        alt_processed = process_meal_response(
+                                            alt_response, meal_type)
+                                        if alt_processed and alt_processed['title'] != meal['title']:
+                                            enhanced_meals[i] = alt_processed
+                                            print(
+                                                f"Replaced {meal_type} with: {alt_processed['title']}")
+                                            break
+                                if enhanced_meals[i]['title'] != meal['title']:
+                                    break
 
         print(f"Enhanced meals: {enhanced_meals}")
 
@@ -569,16 +1082,18 @@ def get_meal_plan_templates():
     except requests.RequestException as e:
         return jsonify({'error': str(e)}), 500
 
+
 @app.route('/api/recipes/by-ingredients', methods=['GET'])
 def get_recipes_by_ingredients():
     ingredients = request.args.get('ingredients')
     print(f"Received ingredients:", ingredients)
     if not ingredients:
         return jsonify({'error': 'No ingredients provided'}), 400
-    
-    # track search history 
+
+    # track search history
     global ingredients_list
-    existing = next((item for item in ingredients_list if item['ingredients'].lower() == ingredients.lower()), None)
+    existing = next((item for item in ingredients_list if item['ingredients'].lower(
+    ) == ingredients.lower()), None)
     if existing:
         existing['search_count'] += 1
         existing['timestamp'] = datetime.now().isoformat()
@@ -594,17 +1109,19 @@ def get_recipes_by_ingredients():
     params = {
         'ingredients': ingredients,
         'number': 5,
-        'ranking': 1,  
+        'ranking': 1,
         'apiKey': API_KEY
     }
     recipes = make_api_request('recipes/findByIngredients', params)
     return jsonify(recipes)
-    
-  
+
+
 @app.route('/api/ingredient-history', methods=['GET'])
 def get_ingredient_history():
-    sorted_history = sorted(ingredients_list, key=lambda x: x['timestamp'], reverse=True)
+    sorted_history = sorted(
+        ingredients_list, key=lambda x: x['timestamp'], reverse=True)
     return jsonify(sorted_history)
+
 
 @app.route('/api/save-recipe', methods=['POST'])
 def save_recipe():
@@ -620,9 +1137,11 @@ def save_recipe():
     saved_recipes.append(recipe_data)
     return jsonify({'message': 'Recipe saved successfully', 'recipe': recipe_data}), 201
 
+
 @app.route('/api/saved-recipes', methods=['GET'])
 def get_saved_recipes():
     return jsonify(sorted(saved_recipes, key=lambda x: x['saved_at'], reverse=True))
+
 
 @app.route('/api/delete-recipe/<int:recipe_id>', methods=['DELETE'])
 def delete_recipe(recipe_id):
@@ -631,6 +1150,8 @@ def delete_recipe(recipe_id):
     return jsonify({'message': 'Recipe deleted successfully'}), 200
 
 # check API health
+
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({
@@ -645,9 +1166,11 @@ def health_check():
         'food_preferences_count': len(user_food_preferences)
     })
 
+
 @app.route('/')
 def home():
     return "Welcome to the Meal Planner API!"
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)
