@@ -70,18 +70,53 @@ export async function addEventToGoogleCalendar(accessToken, event) {
 
 // generate meal recommendations with Gemini
 export async function generateMealRecommendations(userPreferences) {
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userPreferences)
-  });
+  try {
+    console.log('Sending request to backend for recommendations...');
+    console.log('User preferences:', userPreferences);
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error?.message || 'Failed to generate meal recommendations');
+    // call backend API
+    const response = await fetch(`${BACKEND_URL}/api/generate-recommendations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userPreferences: userPreferences
+      })
+    });
+
+    console.log('Backend response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      console.error('Backend error:', errorData);
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Backend response data:', data);
+    
+    if (!data.recommendations) {
+      throw new Error('No recommendations received from backend');
+    }
+
+    console.log('Successfully received recommendations from backend');
+    return {
+      recommendations: data.recommendations,
+      success: true
+    };
+  } catch (error) {
+    console.error('Error calling backend for recommendations:', error);
+    
+    // error handling
+    if (error.message.includes('fetch')) {
+      throw new Error('Unable to connect to backend service. Please make sure the backend is running on port 5001.');
+    } else if (error.message.includes('API key')) {
+      throw new Error('AI service not configured on backend. Please check backend configuration.');
+    } else {
+      throw new Error('Failed to generate recommendations: ' + error.message);
+    }
   }
-
-  return response.json();
 }
 
 

@@ -255,6 +255,11 @@ function MealPlanPage() {
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [hoveredCard, setHoveredCard] = useState(null);
+
+  const [calendarConnected, setCalendarConnected] = useState(false);
+  const [accessToken, setAccessToken] = useState(null);
+  const [calendarLoading, setCalendarLoading] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -266,7 +271,53 @@ function MealPlanPage() {
       setMealPlan(parsedMealPlan);
     }
     setLoading(false);
+
+    // check if Google Calendar is connected
+    const token = localStorage.getItem('googleCalendarAccessToken');
+    if (token) {
+      setAccessToken(token);
+      setCalendarConnected(true);
+    }
   }, []);
+
+  useEffect(() => {
+    const initializeGoogleCalendar = () => {
+      if(typeof gapi === 'undefined') {
+        gapi.load('client:auth2', () => {
+          gapi.client.init({
+            clientId: 'YOUR_GOOGLE_CLIENT_ID',
+            scope: 'https://www.googleapis.com/auth/calendar'
+          });
+        });
+      } 
+    };
+    const checkCalendarConnection = setInterval (() => {
+      if (typeof gapi !== 'undefined') {
+        initializeGoogleCalendar();
+        clearInterval(checkCalendarConnection);
+      }
+    }, 1000);
+    return () => clearInterval(checkCalendarConnection);
+  }, []); 
+
+  // google calendar connection
+  const handleConnectCalendar = async () => {
+    setCalendarLoading(true);
+    try {
+      if (typeof gapi === 'undefined') {
+        throw new Error('Google API not loaded');
+      }
+      const auth = gapi.auth2.getAuthInstance();
+      const googleUser = await auth.signIn();
+      const token = googleUser.getAuthResponse().access_token;
+      alert('Google Calendar connected successfully!');
+    } catch (error) {
+      console.error('Error connecting to Google Calendar:', error);
+      alert('Failed to connect to Google Calendar. Please try again.');
+    } finally {
+      setCalendarLoading(false);
+    }
+  };
 
   const handleMealClick = (meal) => {
     console.log('Selected meal data:', meal);
@@ -903,7 +954,7 @@ function GoogleAuthButton({ onLogin }) {
   );
 }
 
-// calendar page
+// Main calendar page
 function CalendarPage() {
   const [accessToken, setAccessToken] = useState(null);
   const [events, setEvents] = useState([]);
@@ -1026,26 +1077,342 @@ function CalendarPage() {
 
 // Recommendations page 
 function RecommendationsPage() {
-  const userPreferences = {
-    height: 170,
-    weight: 70,
-    goal: "Maintain Weight",
-    restrictions: "vegetarian",
-    foodLog: "Oatmeal, tofu salad, lentil soup",
-    recentRecipes: ["Quinoa bowl", "Chickpea stir fry"]
+  const [recommendations, setRecommendations] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [mealPlan, setMealPlan] = useState(null);
+  const [hasGeneratedRecommendations, setHasGeneratedRecommendations] = useState(false);
+
+  useEffect(() => {
+    const storedMealPlan = localStorage.getItem('currentMealPlan');
+    if (storedMealPlan) {
+      setMealPlan(JSON.parse(storedMealPlan));
+    }
+  }, []);
+
+  const generateRecommendations = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      // user prefrences from meal plan data 
+      const userPreferences = {
+        height: mealPlan?.user_preferences?.height || 'Not specified',
+        weight: mealPlan?.user_preferences?.weight || 'Not specified',
+        goal: mealPlan?.goal || 'maintain weight',
+        restrictions: mealPlan?.user_preferences?.restrictions || 'None',
+        foodLog: mealPlan?.user_preferences?.foods || 'No recent food log available',
+        recentRecipes: mealPlan?.meals?.map(meal => meal.title) || [],
+        currentMeals: mealPlan?.meals?.map(meal => ({
+          type: meal.type,
+          title: meal.title,
+          calories: meal.calories || 0,
+          protein: meal.protein || 0,
+          carbs: meal.carbs || 0,
+          fat: meal.fat || 0
+        })) || [],
+        dailyCalories: mealPlan?.daily_calories || 2000
+      };
+
+
+      console.log('Meal plan data:', mealPlan);
+      console.log('Generating recommendations with preferences:', userPreferences);
+
+      const response = await generateMealRecommendations(userPreferences);
+
+      if (response && response.recommendations) {
+        setRecommendations(response.recommendations);
+        setHasGeneratedRecommendations(true);
+        localStorage.setItem('lastRecommendations', JSON.stringify({
+          recommendations: response.recommendations,
+          timestamp: new Date().toISOString()
+        }));
+      } else {
+        throw new Error('No recommendations received from AI');
+      }
+    } catch (err) {
+      console.error('Error generating recommendations:', err);
+
+      // error handling
+      let errorMessage = 'Failed to generate recommendations';
+      if (err.message.includes('API key')) {
+        errorMessage = 'AI service not configured properly. Please check API settings.';
+      } else if (err.message.includes('network') || err.message.includes('fetch')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else if (err.message.includes('Invalid JSON')) {
+        errorMessage = 'Service configuration error. Please try again or contact support.';
+      } else {
+        errorMessage = err.message || 'Unknown error occurred';
+      }
+     
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const formatRecommendations = (text) => {
+    // clean up the text 
+    let cleanedText = text.replace(/\*\*\*/g, '').replace(/\*\*/g, '').replace(/\* \*/g, '• ').replace(/\*([^*]+)\*/g, '$1').replace(/^\* /gm, '• ') .replace(/\*\s*/g, '• ').replace(/\n\s*\n\s*\n/g, '\n\n').replace(/^\s+/gm, '').trim();
+    const sections = cleanedText.split(/(?=\d\.)/);
+    return sections.map((section, index) => {
+      if (section.trim() === '') return null;
+      const isNumberedSection = /^\d+\./.test(section.trim());
+      // if section is numbered, split into title and content
+      if (isNumberedSection) {
+        const lines = section.split('\n').filter(line => line.trim() !== '');
+        const title = lines[0];
+        const content = lines.slice(1).join('\n');
+       
+        return (
+          <div key={index} style={{
+            marginBottom: '2rem',
+            padding: '1.5rem',
+            background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+            borderRadius: '12px',
+            border: '1px solid #dee2e6',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+          }}>
+            <h3 style={{
+              margin: '0 0 1rem 0',
+              color: '#495057',
+              fontSize: '1.25rem',
+              fontWeight: '600',
+              borderBottom: '2px solid #6c757d',
+              paddingBottom: '0.5rem'
+            }}>
+              {title}
+            </h3>
+            <div style={{
+              lineHeight: '1.6',
+              color: '#333',
+              whiteSpace: 'pre-line'
+            }}>
+              {content}
+            </div>
+          </div>
+        );
+      } else {
+        return (
+          // regular section without number
+          <div key={index} style={{
+            marginBottom: '1rem',
+            lineHeight: '1.6',
+            color: '#333',
+            whiteSpace: 'pre-line'
+          }}>
+            {section}
+          </div>
+        );
+      }
+    }).filter(Boolean);
+  };
+
   return (
     <div className="page-container">
       <div className="page-header">
         <h2>AI Recommendations</h2>
-        <p>Get personalized meal suggestions based on your preferences and history</p>
+        <p>Get personalized meal suggestions based on your preferences</p>
       </div>
-      <div className="content-placeholder">
-        <p>AI-powered recommendations will be available soon!</p>
-      </div>
+      {!mealPlan ? (
+        <div style={{
+          textAlign: 'center',
+          padding: '3rem 0',
+          background: '#fff3cd',
+          borderRadius: '8px',
+          border: '1px solid #ffeaa7'
+        }}>
+          <h3 style={{ color: '#856404', marginBottom: '1rem' }}>No Meal Plan Found</h3>
+          <p style={{ color: '#856404', marginBottom: '1.5rem' }}>
+            Please generate a meal plan first to get personalized recommendations.
+          </p>
+          <button
+            onClick={() => window.location.href = '/diet-input'}
+            className="btn btn-primary"
+          >
+            Create Meal Plan
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Current Plan Summary */}
+          <div style={{
+            background: '#e3f2fd',
+            padding: '1.5rem',
+            borderRadius: '8px',
+            marginBottom: '2rem',
+            border: '1px solid #bbdefb'
+          }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#1565c0' }}>Summary</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              <div>
+                <strong>Daily Target:</strong> {mealPlan.daily_calories} calories
+              </div>
+              <div>
+                <strong>Goal:</strong> {mealPlan.goal}
+              </div>
+              <div>
+                <strong>Height:</strong> {mealPlan.user_preferences?.height || 'Not specified'} cm
+              </div>
+              <div>
+                <strong>Weight:</strong> {mealPlan.user_preferences?.weight || 'Not specified'} kg
+              </div>
+            </div>
+            {mealPlan.user_preferences?.restrictions && (
+              <div style={{ marginTop: '1rem' }}>
+                <strong>Restrictions:</strong> {mealPlan.user_preferences.restrictions}
+              </div>
+            )}
+          </div>
+
+          {/* Generate Recommendations Button */}
+          {!hasGeneratedRecommendations && (
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <button
+                onClick={generateRecommendations}
+                disabled={loading}
+                className="btn btn-success"
+                style={{
+                  padding: '1rem 2rem',
+                  fontSize: '1.1rem',
+                  minWidth: '200px'
+                }}
+              >
+                {loading ? (
+                  <>
+                    <span style={{ marginRight: '0.5rem' }}></span>
+                    Generating Recommendations...
+                  </>
+                ) : (
+                  <>
+                    <span style={{ marginRight: '0.5rem' }}></span>
+                    Get Recommendations
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+
+          {/* Error Display */}
+          {error && (
+            <div style={{
+              background: '#f8d7da',
+              color: '#721c24',
+              padding: '1rem',
+              borderRadius: '8px',
+              border: '1px solid #f5c6cb',
+              marginBottom: '2rem'
+            }}>
+              <strong>Error:</strong> {error}
+              <button
+                onClick={generateRecommendations}
+                style={{
+                  marginLeft: '1rem',
+                  padding: '0.5rem 1rem',
+                  background: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {/* Recommendations Display */}
+          {recommendations && (
+            <div style={{
+              background: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              border: '1px solid #dee2e6',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '2rem',
+                paddingBottom: '1rem',
+                borderBottom: '2px solid #e9ecef'
+              }}>
+                <span style={{ fontSize: '2rem', marginRight: '1rem' }}></span>
+                <div>
+                  <h3 style={{ margin: 0, color: '#333' }}>Recommendations</h3>
+                  <p style={{ margin: 0, color: '#6c757d' }}>
+                    Personalized suggestions based on your current meal plan
+                  </p>
+                </div>
+              </div>
+             
+              <div style={{ fontSize: '1rem', lineHeight: '1.6' }}>
+                {formatRecommendations(recommendations)}
+              </div>
+
+
+              {/* Action Buttons */}
+              <div style={{
+                marginTop: '2rem',
+                paddingTop: '1rem',
+                borderTop: '1px solid #e9ecef',
+                display: 'flex',
+                gap: '1rem',
+                flexWrap: 'wrap'
+              }}>
+                <button
+                  onClick={generateRecommendations}
+                  className="btn btn-primary"
+                  disabled={loading}
+                >
+                  Generate New Recommendations
+                </button>
+                <button
+                  onClick={() => window.location.href = '/diet-input'}
+                  className="btn btn-success"
+                >
+                  Update Meal Plan
+                </button>
+                <button
+                  onClick={() => window.location.href = '/meal-plan'}
+                  className="btn btn-primary"
+                >
+                  View Current Plan
+                </button>
+              </div>
+            </div>
+          )}
+
+
+          {/* No recommendations placeholder */}
+          {!recommendations && !loading && !error && hasGeneratedRecommendations && (
+            <div style={{
+              textAlign: 'center',
+              padding: '3rem 0',
+              background: '#f8f9fa',
+              borderRadius: '8px',
+              border: '1px solid #dee2e6'
+            }}>
+              <p style={{ color: '#6c757d', margin: 0 }}>
+                No recommendations generated. Please try again.
+              </p>
+            </div>
+          )}
+        </>
+      )}
+
+
+      {/* Add CSS for spinning animation */}
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
+
 
 function App() {
   return (
@@ -1065,6 +1432,6 @@ function App() {
       </div>
     </Router>
   );
-}
+} 
 
 export default App;
