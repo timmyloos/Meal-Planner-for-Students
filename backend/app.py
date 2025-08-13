@@ -749,301 +749,278 @@ def generate_meal_plan():
         daily_calories = 2000  # default
 
     try:
-        # Parse dietary restrictions and food preferences
-        restrictions = restrictions.lower() if restrictions else ''
-        foods = foods.lower() if foods else ''
-
-        # Build search parameters based on restrictions and preferences
-        search_params = {
-            'addRecipeNutrition': True,
-            'number': 3,  # Get 3 options per meal type
-            'apiKey': API_KEY
-        }
-
-        # Add dietary restrictions
-        if 'vegetarian' in restrictions:
-            search_params['diet'] = 'vegetarian'
-        elif 'vegan' in restrictions:
-            search_params['diet'] = 'vegan'
-        elif 'gluten-free' in restrictions or 'gluten free' in restrictions:
-            search_params['diet'] = 'gluten-free'
-        elif 'dairy-free' in restrictions or 'dairy free' in restrictions:
-            search_params['diet'] = 'dairy-free'
-        elif 'keto' in restrictions:
-            search_params['diet'] = 'ketogenic'
-        elif 'paleo' in restrictions:
-            search_params['diet'] = 'paleo'
-
-        # Add food preferences to search query
-        if foods:
-            # Extract first few ingredients for search
-            food_list = [f.strip() for f in foods.split(',')[:3]]
-            search_params['includeIngredients'] = ','.join(food_list)
-
-        # Add additional search parameters for better results
-        search_params['sort'] = 'popularity'  # Get popular recipes
-        search_params['sortDirection'] = 'desc'
-
-        # Add intolerance filters if specified
-        intolerances = []
-        if 'gluten' in restrictions:
-            intolerances.append('gluten')
-        if 'dairy' in restrictions:
-            intolerances.append('dairy')
-        if 'nuts' in restrictions or 'peanut' in restrictions:
-            intolerances.append('tree nut')
-        if 'shellfish' in restrictions:
-            intolerances.append('shellfish')
-        if 'soy' in restrictions:
-            intolerances.append('soy')
-        if 'egg' in restrictions:
-            intolerances.append('egg')
-        if 'fish' in restrictions:
-            intolerances.append('fish')
-
-        if intolerances:
-            search_params['intolerances'] = ','.join(intolerances)
-
-        print(f"Search parameters: {search_params}")
-
-        # Search for breakfast recipes with variety
-        breakfast_queries = ['breakfast', 'morning meal',
-                             'eggs', 'pancakes', 'oatmeal']
-        breakfast_params = {**search_params, 'maxReadyTime': 30}
-
-        breakfast_response = None
-        for query in breakfast_queries:
-            breakfast_params['query'] = query
-            breakfast_response = requests.get(
-                f'{BASE_URL}/recipes/complexSearch',
-                params=breakfast_params
-            )
-            if breakfast_response.ok and breakfast_response.json().get('results'):
-                print(f"Breakfast found with query '{query}'")
-                break
-
-        if not breakfast_response or not breakfast_response.ok:
-            # Fallback to basic breakfast search
-            breakfast_params['query'] = 'breakfast'
-            breakfast_response = requests.get(
-                f'{BASE_URL}/recipes/complexSearch',
-                params=breakfast_params
-            )
-
+        # Search for breakfast recipes
+        breakfast_response = requests.get(
+            f'{BASE_URL}/recipes/complexSearch',
+            params={
+                'query': 'breakfast',
+                'number': 1,
+                'addRecipeNutrition': True,
+                'maxReadyTime': 30,
+                'apiKey': API_KEY
+            }
+        )
         print(
-            f"Breakfast API Response Status: {breakfast_response.status_code if breakfast_response else 'No response'}")
+            f"Breakfast API Response Status: {breakfast_response.status_code}")
 
-        # Search for lunch recipes with variety
-        lunch_queries = ['lunch', 'sandwich', 'salad', 'soup', 'pasta']
-        lunch_params = {**search_params, 'maxReadyTime': 45}
+        # Search for lunch recipes
+        lunch_response = requests.get(
+            f'{BASE_URL}/recipes/complexSearch',
+            params={
+                'query': 'lunch',
+                'number': 1,
+                'addRecipeNutrition': True,
+                'maxReadyTime': 45,
+                'apiKey': API_KEY
+            }
+        )
+        print(f"Lunch API Response Status: {lunch_response.status_code}")
 
-        lunch_response = None
-        for query in lunch_queries:
-            lunch_params['query'] = query
-            lunch_response = requests.get(
-                f'{BASE_URL}/recipes/complexSearch',
-                params=lunch_params
-            )
-            if lunch_response.ok and lunch_response.json().get('results'):
-                print(f"Lunch found with query '{query}'")
-                break
-
-        if not lunch_response or not lunch_response.ok:
-            # Fallback to basic lunch search
-            lunch_params['query'] = 'lunch'
-            lunch_response = requests.get(
-                f'{BASE_URL}/recipes/complexSearch',
-                params=lunch_params
-            )
-
-        print(
-            f"Lunch API Response Status: {lunch_response.status_code if lunch_response else 'No response'}")
-
-        # Search for dinner recipes with variety
-        dinner_queries = ['dinner', 'main course',
-                          'chicken', 'beef', 'fish', 'vegetarian main']
-        dinner_params = {**search_params, 'maxReadyTime': 60}
-
-        dinner_response = None
-        for query in dinner_queries:
-            dinner_params['query'] = query
-            dinner_response = requests.get(
-                f'{BASE_URL}/recipes/complexSearch',
-                params=dinner_params
-            )
-            if dinner_response.ok and dinner_response.json().get('results'):
-                print(f"Dinner found with query '{query}'")
-                break
-
-        if not dinner_response or not dinner_response.ok:
-            # Fallback to basic dinner search
-            dinner_params['query'] = 'dinner'
-            dinner_response = requests.get(
-                f'{BASE_URL}/recipes/complexSearch',
-                params=dinner_params
-            )
-
-        print(
-            f"Dinner API Response Status: {dinner_response.status_code if dinner_response else 'No response'}")
+        # Search for dinner recipes
+        dinner_response = requests.get(
+            f'{BASE_URL}/recipes/complexSearch',
+            params={
+                'query': 'dinner',
+                'number': 1,
+                'addRecipeNutrition': True,
+                'maxReadyTime': 60,
+                'apiKey': API_KEY
+            }
+        )
+        print(f"Dinner API Response Status: {dinner_response.status_code}")
 
         enhanced_meals = []
-        used_recipe_ids = set()  # Track used recipe IDs to avoid duplicates
-
-        def process_meal_response(response, meal_type):
-            """Process meal response and return the best meal, avoiding duplicates"""
-            if not response.ok:
-                return None
-
-            data = response.json()
-            if not data.get('results'):
-                return None
-
-            # Find the first recipe that hasn't been used yet
-            for meal in data['results']:
-                if meal['id'] not in used_recipe_ids:
-                    used_recipe_ids.add(meal['id'])  # Mark this recipe as used
-                    break
-            else:
-                # If all recipes are duplicates, use the first one but log it
-                meal = data['results'][0]
-                print(
-                    f"Warning: Using duplicate recipe for {meal_type}: {meal['title']}")
-
-            # Get detailed recipe information
-            recipe_id = meal['id']
-            detailed_response = requests.get(
-                f'{BASE_URL}/recipes/{recipe_id}/information',
-                params={'apiKey': API_KEY}
-            )
-
-            detailed_recipe = {}
-            if detailed_response.ok:
-                detailed_recipe = detailed_response.json()
-                print(
-                    f"Detailed {meal_type} recipe fetched: {detailed_recipe.get('title', 'Unknown')}")
-
-            # Try to get equipment from a different endpoint or extract from instructions
-            equipment_data = detailed_recipe.get('equipment', [])
-            if not equipment_data and detailed_recipe.get('instructions'):
-                # Extract common equipment from instructions
-                instructions = detailed_recipe.get('instructions', '').lower()
-                common_equipment = []
-
-                equipment_keywords = [
-                    'oven', 'stove', 'pan', 'pot', 'bowl', 'whisk', 'spoon', 'knife',
-                    'cutting board', 'baking sheet', 'muffin tin', 'blender', 'mixer',
-                    'food processor', 'grater', 'measuring cup', 'measuring spoon'
-                ]
-
-                for keyword in equipment_keywords:
-                    if keyword in instructions:
-                        common_equipment.append({'name': keyword.title()})
-
-                equipment_data = common_equipment
-                print(
-                    f"Extracted equipment from instructions: {len(equipment_data)} items")
-
-            # Extract nutrition information properly
-            nutrition = meal.get('nutrition', {})
-            nutrients = nutrition.get('nutrients', [])
-
-            # Find specific nutrients
-            calories = next(
-                (n for n in nutrients if n['name'] == 'Calories'), None)
-            protein = next(
-                (n for n in nutrients if n['name'] == 'Protein'), None)
-            carbs = next(
-                (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
-            fat = next((n for n in nutrients if n['name'] == 'Fat'), None)
-
-            return {
-                'type': meal_type,
-                'title': meal['title'],
-                'image': meal['image'],
-                'calories': calories['amount'] if calories else 0,
-                'protein': protein['amount'] if protein else 0,
-                'carbs': carbs['amount'] if carbs else 0,
-                'fat': fat['amount'] if fat else 0,
-                'readyInMinutes': meal.get('readyInMinutes', 0),
-                'servings': meal.get('servings', 1),
-                'instructions': detailed_recipe.get('instructions', ''),
-                'ingredients': detailed_recipe.get('extendedIngredients', []),
-                'equipment': equipment_data,
-                'summary': detailed_recipe.get('summary', ''),
-                'cuisines': meal.get('cuisines', []),
-                'diets': meal.get('diets', []),
-                'sourceUrl': detailed_recipe.get('sourceUrl', ''),
-                'sourceName': detailed_recipe.get('sourceName', ''),
-                'pricePerServing': detailed_recipe.get('pricePerServing', 0),
-                'healthScore': detailed_recipe.get('healthScore', 0),
-                'spoonacularScore': detailed_recipe.get('spoonacularScore', 0)
-            }
 
         # Process breakfast
-        breakfast_meal = process_meal_response(breakfast_response, 'breakfast')
-        if breakfast_meal:
-            enhanced_meals.append(breakfast_meal)
+        if breakfast_response.ok:
+            breakfast_data = breakfast_response.json()
+            if breakfast_data.get('results'):
+                meal = breakfast_data['results'][0]
+
+                # Get detailed recipe information
+                recipe_id = meal['id']
+                detailed_response = requests.get(
+                    f'{BASE_URL}/recipes/{recipe_id}/information',
+                    params={'apiKey': API_KEY}
+                )
+
+                detailed_recipe = {}
+                if detailed_response.ok:
+                    detailed_recipe = detailed_response.json()
+                    print(
+                        f"Detailed breakfast recipe fetched: {detailed_recipe.get('title', 'Unknown')}")
+
+                # Try to get equipment from a different endpoint or extract from instructions
+                equipment_data = detailed_recipe.get('equipment', [])
+                if not equipment_data and detailed_recipe.get('instructions'):
+                    # Extract common equipment from instructions
+                    instructions = detailed_recipe.get(
+                        'instructions', '').lower()
+                    common_equipment = []
+
+                    equipment_keywords = [
+                        'oven', 'stove', 'pan', 'pot', 'bowl', 'whisk', 'spoon', 'knife',
+                        'cutting board', 'baking sheet', 'muffin tin', 'blender', 'mixer',
+                        'food processor', 'grater', 'measuring cup', 'measuring spoon'
+                    ]
+
+                    for keyword in equipment_keywords:
+                        if keyword in instructions:
+                            common_equipment.append({'name': keyword.title()})
+
+                    equipment_data = common_equipment
+                    print(
+                        f"Extracted equipment from instructions: {len(equipment_data)} items")
+
+                # Extract nutrition information properly
+                nutrition = meal.get('nutrition', {})
+                nutrients = nutrition.get('nutrients', [])
+
+                # Find specific nutrients
+                calories = next(
+                    (n for n in nutrients if n['name'] == 'Calories'), None)
+                protein = next(
+                    (n for n in nutrients if n['name'] == 'Protein'), None)
+                carbs = next(
+                    (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
+                fat = next((n for n in nutrients if n['name'] == 'Fat'), None)
+
+                enhanced_meals.append({
+                    'type': 'breakfast',
+                    'title': meal['title'],
+                    'image': meal['image'],
+                    'calories': calories['amount'] if calories else 0,
+                    'protein': protein['amount'] if protein else 0,
+                    'carbs': carbs['amount'] if carbs else 0,
+                    'fat': fat['amount'] if fat else 0,
+                    'readyInMinutes': meal.get('readyInMinutes', 0),
+                    'servings': meal.get('servings', 1),
+                    'instructions': detailed_recipe.get('instructions', ''),
+                    'ingredients': detailed_recipe.get('extendedIngredients', []),
+                    'equipment': equipment_data,
+                    'summary': detailed_recipe.get('summary', ''),
+                    'cuisines': meal.get('cuisines', []),
+                    'diets': meal.get('diets', []),
+                    'sourceUrl': detailed_recipe.get('sourceUrl', ''),
+                    'sourceName': detailed_recipe.get('sourceName', ''),
+                    'pricePerServing': detailed_recipe.get('pricePerServing', 0),
+                    'healthScore': detailed_recipe.get('healthScore', 0),
+                    'spoonacularScore': detailed_recipe.get('spoonacularScore', 0)
+                })
 
         # Process lunch
-        lunch_meal = process_meal_response(lunch_response, 'lunch')
-        if lunch_meal:
-            enhanced_meals.append(lunch_meal)
+        if lunch_response.ok:
+            lunch_data = lunch_response.json()
+            if lunch_data.get('results'):
+                meal = lunch_data['results'][0]
+
+                # Get detailed recipe information
+                recipe_id = meal['id']
+                detailed_response = requests.get(
+                    f'{BASE_URL}/recipes/{recipe_id}/information',
+                    params={'apiKey': API_KEY}
+                )
+
+                detailed_recipe = {}
+                if detailed_response.ok:
+                    detailed_recipe = detailed_response.json()
+                    print(
+                        f"Detailed lunch recipe fetched: {detailed_recipe.get('title', 'Unknown')}")
+
+                # Try to get equipment from a different endpoint or extract from instructions
+                equipment_data = detailed_recipe.get('equipment', [])
+                if not equipment_data and detailed_recipe.get('instructions'):
+                    # Extract common equipment from instructions
+                    instructions = detailed_recipe.get(
+                        'instructions', '').lower()
+                    common_equipment = []
+
+                    equipment_keywords = [
+                        'oven', 'stove', 'pan', 'pot', 'bowl', 'whisk', 'spoon', 'knife',
+                        'cutting board', 'baking sheet', 'muffin tin', 'blender', 'mixer',
+                        'food processor', 'grater', 'measuring cup', 'measuring spoon'
+                    ]
+
+                    for keyword in equipment_keywords:
+                        if keyword in instructions:
+                            common_equipment.append({'name': keyword.title()})
+
+                    equipment_data = common_equipment
+                    print(
+                        f"Extracted equipment from instructions: {len(equipment_data)} items")
+
+                # Extract nutrition information properly
+                nutrition = meal.get('nutrition', {})
+                nutrients = nutrition.get('nutrients', [])
+
+                # Find specific nutrients
+                calories = next(
+                    (n for n in nutrients if n['name'] == 'Calories'), None)
+                protein = next(
+                    (n for n in nutrients if n['name'] == 'Protein'), None)
+                carbs = next(
+                    (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
+                fat = next((n for n in nutrients if n['name'] == 'Fat'), None)
+
+                enhanced_meals.append({
+                    'type': 'lunch',
+                    'title': meal['title'],
+                    'image': meal['image'],
+                    'calories': calories['amount'] if calories else 0,
+                    'protein': protein['amount'] if protein else 0,
+                    'carbs': carbs['amount'] if carbs else 0,
+                    'fat': fat['amount'] if fat else 0,
+                    'readyInMinutes': meal.get('readyInMinutes', 0),
+                    'servings': meal.get('servings', 1),
+                    'instructions': detailed_recipe.get('instructions', ''),
+                    'ingredients': detailed_recipe.get('extendedIngredients', []),
+                    'equipment': equipment_data,
+                    'summary': detailed_recipe.get('summary', ''),
+                    'cuisines': meal.get('cuisines', []),
+                    'diets': meal.get('diets', []),
+                    'sourceUrl': detailed_recipe.get('sourceUrl', ''),
+                    'sourceName': detailed_recipe.get('sourceName', ''),
+                    'pricePerServing': detailed_recipe.get('pricePerServing', 0),
+                    'healthScore': detailed_recipe.get('healthScore', 0),
+                    'spoonacularScore': detailed_recipe.get('spoonacularScore', 0)
+                })
 
         # Process dinner
-        dinner_meal = process_meal_response(dinner_response, 'dinner')
-        if dinner_meal:
-            enhanced_meals.append(dinner_meal)
+        if dinner_response.ok:
+            dinner_data = dinner_response.json()
+            if dinner_data.get('results'):
+                meal = dinner_data['results'][0]
 
-        # If we have duplicates, try to get alternative recipes
-        meal_titles = [meal['title'] for meal in enhanced_meals]
-        if len(meal_titles) != len(set(meal_titles)):
-            print("Detected duplicates, trying to get alternative recipes...")
+                # Get detailed recipe information
+                recipe_id = meal['id']
+                detailed_response = requests.get(
+                    f'{BASE_URL}/recipes/{recipe_id}/information',
+                    params={'apiKey': API_KEY}
+                )
 
-            # Try alternative searches for duplicates
-            for i, meal in enumerate(enhanced_meals):
-                if meal_titles.count(meal['title']) > 1:
-                    meal_type = meal['type']
-                    print(f"Getting alternative for {meal_type}...")
+                detailed_recipe = {}
+                if detailed_response.ok:
+                    detailed_recipe = detailed_response.json()
+                    print(
+                        f"Detailed dinner recipe fetched: {detailed_recipe.get('title', 'Unknown')}")
 
-                    # Try different search terms for this meal type
-                    if meal_type == 'breakfast':
-                        alt_queries = ['muffins',
-                                       'cereal', 'yogurt', 'smoothie']
-                    elif meal_type == 'lunch':
-                        alt_queries = ['wrap', 'bowl', 'stir fry', 'quinoa']
-                    else:  # dinner
-                        alt_queries = ['roast', 'grill', 'bake', 'stew']
+                # Try to get equipment from a different endpoint or extract from instructions
+                equipment_data = detailed_recipe.get('equipment', [])
+                if not equipment_data and detailed_recipe.get('instructions'):
+                    # Extract common equipment from instructions
+                    instructions = detailed_recipe.get(
+                        'instructions', '').lower()
+                    common_equipment = []
 
-                    for alt_query in alt_queries:
-                        alt_params = {**search_params, 'query': alt_query}
-                        if meal_type == 'breakfast':
-                            alt_params['maxReadyTime'] = 30
-                        elif meal_type == 'lunch':
-                            alt_params['maxReadyTime'] = 45
-                        else:
-                            alt_params['maxReadyTime'] = 60
+                    equipment_keywords = [
+                        'oven', 'stove', 'pan', 'pot', 'bowl', 'whisk', 'spoon', 'knife',
+                        'cutting board', 'baking sheet', 'muffin tin', 'blender', 'mixer',
+                        'food processor', 'grater', 'measuring cup', 'measuring spoon'
+                    ]
 
-                        alt_response = requests.get(
-                            f'{BASE_URL}/recipes/complexSearch',
-                            params=alt_params
-                        )
+                    for keyword in equipment_keywords:
+                        if keyword in instructions:
+                            common_equipment.append({'name': keyword.title()})
 
-                        if alt_response.ok:
-                            alt_data = alt_response.json()
-                            if alt_data.get('results'):
-                                # Find first unused recipe
-                                for alt_meal in alt_data['results']:
-                                    if alt_meal['id'] not in used_recipe_ids:
-                                        # Process this alternative meal
-                                        alt_processed = process_meal_response(
-                                            alt_response, meal_type)
-                                        if alt_processed and alt_processed['title'] != meal['title']:
-                                            enhanced_meals[i] = alt_processed
-                                            print(
-                                                f"Replaced {meal_type} with: {alt_processed['title']}")
-                                            break
-                                if enhanced_meals[i]['title'] != meal['title']:
-                                    break
+                    equipment_data = common_equipment
+                    print(
+                        f"Extracted equipment from instructions: {len(equipment_data)} items")
+
+                # Extract nutrition information properly
+                nutrition = meal.get('nutrition', {})
+                nutrients = nutrition.get('nutrients', [])
+
+                # Find specific nutrients
+                calories = next(
+                    (n for n in nutrients if n['name'] == 'Calories'), None)
+                protein = next(
+                    (n for n in nutrients if n['name'] == 'Protein'), None)
+                carbs = next(
+                    (n for n in nutrients if n['name'] == 'Carbohydrates'), None)
+                fat = next((n for n in nutrients if n['name'] == 'Fat'), None)
+
+                enhanced_meals.append({
+                    'type': 'dinner',
+                    'title': meal['title'],
+                    'image': meal['image'],
+                    'calories': calories['amount'] if calories else 0,
+                    'protein': protein['amount'] if protein else 0,
+                    'carbs': carbs['amount'] if carbs else 0,
+                    'fat': fat['amount'] if fat else 0,
+                    'readyInMinutes': meal.get('readyInMinutes', 0),
+                    'servings': meal.get('servings', 1),
+                    'instructions': detailed_recipe.get('instructions', ''),
+                    'ingredients': detailed_recipe.get('extendedIngredients', []),
+                    'equipment': equipment_data,
+                    'summary': detailed_recipe.get('summary', ''),
+                    'cuisines': meal.get('cuisines', []),
+                    'diets': meal.get('diets', []),
+                    'sourceUrl': detailed_recipe.get('sourceUrl', ''),
+                    'sourceName': detailed_recipe.get('sourceName', ''),
+                    'pricePerServing': detailed_recipe.get('pricePerServing', 0),
+                    'healthScore': detailed_recipe.get('healthScore', 0),
+                    'spoonacularScore': detailed_recipe.get('spoonacularScore', 0)
+                })
 
         print(f"Enhanced meals: {enhanced_meals}")
 
