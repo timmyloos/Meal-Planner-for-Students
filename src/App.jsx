@@ -13,7 +13,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { searchRecipesByIngredients, generateMealPlan, addEventToGoogleCalendar, generateMealRecommendations } from './utils/api';
 
-const BACKEND_URL = 'http://localhost:5001';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {

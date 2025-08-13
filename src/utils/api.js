@@ -4,7 +4,7 @@ const GOOGLE_CALENDAR_API_KEY = import.meta.env.VITE_GOOGLE_CALENDAR_API_KEY;
 const GOOGLE_CALENDAR_CLIENT_ID = '85533172291-16pfu8d6lhntu38t21v1vm38lk5q76jc.apps.googleusercontent.com';
 const CALENDAR_SCOPES = 'https://www.googleapis.com/auth/calendar'
 const BASE_URL = 'https://api.spoonacular.com';
-const BACKEND_URL = 'http://localhost:5001';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001';
 
 // call Flask backend to search recipes by ingredients
 export async function searchRecipesByIngredients(ingredients) {
