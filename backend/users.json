@@ -8,675 +8,209 @@
       "created_at": "2025-08-12T15:37:46.479160",
       "diet_input": {
         "height": "178",
-        "weight": "82",
+        "weight": "68",
         "goal": "maintain",
-        "restrictions": "vegetarian ",
+        "restrictions": "",
         "foods": ""
       },
       "meal_plans": [
         {
-          "daily_calories": 1807,
+          "daily_calories": 1667,
           "goal": "maintain",
           "meals": [
             {
-              "calories": 148.29,
-              "carbs": 34.2,
+              "calories": 126.12,
+              "carbs": 4.83,
               "cuisines": [],
               "diets": [
-                "lacto ovo vegetarian"
-              ],
-              "equipment": [
-                {
-                  "name": "Bowl"
-                },
-                {
-                  "name": "Spoon"
-                }
-              ],
-              "fat": 0.76,
-              "healthScore": 0,
-              "image": "https://img.spoonacular.com/recipes/775666-312x231.jpg",
-              "ingredients": [
-                {
-                  "aisle": "Baking",
-                  "amount": 1,
-                  "consistency": "SOLID",
-                  "id": 20081,
-                  "image": "flour.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 125,
-                      "unitLong": "grams",
-                      "unitShort": "g"
-                    },
-                    "us": {
-                      "amount": 1,
-                      "unitLong": "cup",
-                      "unitShort": "cup"
-                    }
-                  },
-                  "meta": [],
-                  "name": "all purpose flour",
-                  "nameClean": "all purpose flour",
-                  "original": "1 cup all purpose flour",
-                  "originalName": "all purpose flour",
-                  "unit": "cup"
-                },
-                {
-                  "aisle": "Produce",
-                  "amount": 1,
-                  "consistency": "SOLID",
-                  "id": 9003,
-                  "image": "apple.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 125,
-                      "unitLong": "grams",
-                      "unitShort": "g"
-                    },
-                    "us": {
-                      "amount": 1,
-                      "unitLong": "cup",
-                      "unitShort": "cup"
-                    }
-                  },
-                  "meta": [
-                    "chopped"
-                  ],
-                  "name": "apple",
-                  "nameClean": "apple",
-                  "original": "1 cup chopped apple",
-                  "originalName": "chopped apple",
-                  "unit": "cup"
-                },
-                {
-                  "aisle": "Baking",
-                  "amount": 1.5,
-                  "consistency": "SOLID",
-                  "id": 18369,
-                  "image": "white-powder.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 1.5,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    },
-                    "us": {
-                      "amount": 1.5,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    }
-                  },
-                  "meta": [],
-                  "name": "baking powder",
-                  "nameClean": "baking powder",
-                  "original": "1 1/2 teaspoons baking powder",
-                  "originalName": "baking powder",
-                  "unit": "teaspoons"
-                },
-                {
-                  "aisle": "Spices and Seasonings",
-                  "amount": 1,
-                  "consistency": "SOLID",
-                  "id": 2010,
-                  "image": "cinnamon.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 1,
-                      "unitLong": "teaspoon",
-                      "unitShort": "tsp"
-                    },
-                    "us": {
-                      "amount": 1,
-                      "unitLong": "teaspoon",
-                      "unitShort": "tsp"
-                    }
-                  },
-                  "meta": [],
-                  "name": "cinnamon",
-                  "nameClean": "cinnamon",
-                  "original": "1 teaspoon cinnamon",
-                  "originalName": "cinnamon",
-                  "unit": "teaspoon"
-                },
-                {
-                  "aisle": "Milk, Eggs, Other Dairy",
-                  "amount": 1,
-                  "consistency": "SOLID",
-                  "id": 1123,
-                  "image": "egg.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 1,
-                      "unitLong": "",
-                      "unitShort": ""
-                    },
-                    "us": {
-                      "amount": 1,
-                      "unitLong": "",
-                      "unitShort": ""
-                    }
-                  },
-                  "meta": [],
-                  "name": "egg",
-                  "nameClean": "egg",
-                  "original": "1 egg",
-                  "originalName": "egg",
-                  "unit": ""
-                },
-                {
-                  "aisle": "Milk, Eggs, Other Dairy",
-                  "amount": 0.33333334,
-                  "consistency": "LIQUID",
-                  "id": 1077,
-                  "image": "milk.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 81.333,
-                      "unitLong": "milliliters",
-                      "unitShort": "ml"
-                    },
-                    "us": {
-                      "amount": 0.33333334,
-                      "unitLong": "cups",
-                      "unitShort": "cups"
-                    }
-                  },
-                  "meta": [],
-                  "name": "milk",
-                  "nameClean": "milk",
-                  "original": "1/3 cup milk",
-                  "originalName": "milk",
-                  "unit": "cup"
-                },
-                {
-                  "aisle": "Milk, Eggs, Other Dairy",
-                  "amount": 1.5,
-                  "consistency": "LIQUID",
-                  "id": 1077,
-                  "image": "milk.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 1.5,
-                      "unitLong": "Tbsps",
-                      "unitShort": "Tbsps"
-                    },
-                    "us": {
-                      "amount": 1.5,
-                      "unitLong": "Tbsps",
-                      "unitShort": "Tbsps"
-                    }
-                  },
-                  "meta": [],
-                  "name": "milk",
-                  "nameClean": "milk",
-                  "original": "1 1/2 tablespoons milk",
-                  "originalName": "milk",
-                  "unit": "tablespoons"
-                },
-                {
-                  "aisle": "Baking",
-                  "amount": 2,
-                  "consistency": "SOLID",
-                  "id": 19336,
-                  "image": "powdered-sugar.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 240,
-                      "unitLong": "grams",
-                      "unitShort": "g"
-                    },
-                    "us": {
-                      "amount": 2,
-                      "unitLong": "cups",
-                      "unitShort": "cups"
-                    }
-                  },
-                  "meta": [],
-                  "name": "powdered sugar",
-                  "nameClean": "powdered sugar",
-                  "original": "2 cups powdered sugar",
-                  "originalName": "powdered sugar",
-                  "unit": "cups"
-                },
-                {
-                  "aisle": "Spices and Seasonings",
-                  "amount": 0.75,
-                  "consistency": "SOLID",
-                  "id": 2047,
-                  "image": "salt.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 0.75,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    },
-                    "us": {
-                      "amount": 0.75,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    }
-                  },
-                  "meta": [],
-                  "name": "salt",
-                  "nameClean": "salt",
-                  "original": "3/4 teaspoon salt",
-                  "originalName": "salt",
-                  "unit": "teaspoon"
-                },
-                {
-                  "aisle": "Baking",
-                  "amount": 0.25,
-                  "consistency": "SOLID",
-                  "id": 19335,
-                  "image": "sugar-in-bowl.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 50,
-                      "unitLong": "grams",
-                      "unitShort": "g"
-                    },
-                    "us": {
-                      "amount": 0.25,
-                      "unitLong": "cups",
-                      "unitShort": "cups"
-                    }
-                  },
-                  "meta": [],
-                  "name": "sugar",
-                  "nameClean": "sugar",
-                  "original": "1/4 cup sugar",
-                  "originalName": "sugar",
-                  "unit": "cup"
-                }
-              ],
-              "instructions": "<p>Combine flour, sugar, salt, baking powder, cinnamon. Stir in milk and egg until just combined. Fold in apple. Pour oil into skillet so that it is approximately 1 1/2 deep. Heat oil on high. Oil is ready when a little dough thrown in floats to top. Carefully add dough to oil in heaping teaspoons. Cook until brown, about 2 minutes, then flip. Cook another 1-2 minutes, until both sides are browned. Transfer briefly to paper towels to absorb excess oil, then transfer to cooling rack. Make glaze by stirring milk and powdered sugar together in a small bowl. Drizzle over apple fritters. Wait approximately 3 minutes for glaze to harden, then flip fritters and drizzle glaze over the other side. Best served warm.</p>",
-              "pricePerServing": 16.09,
-              "protein": 1.86,
-              "readyInMinutes": 30,
-              "servings": 12,
-              "sourceName": "recipeoftoday.com",
-              "sourceUrl": "https://www.recipeoftoday.com/2015/05/easy-homemade-apple-fritters.html?m=1",
-              "spoonacularScore": 14.519948959350586,
-              "summary": "Easy Homemade Apple Fritters might be just the breakfast you are searching for. One portion of this dish contains approximately <b>2g of protein</b>, <b>1g of fat</b>, and a total of <b>148 calories</b>. This recipe serves 12 and costs 16 cents per serving. If you have egg, apple, sugar, and a few other ingredients on hand, you can make it. 1334 people were impressed by this recipe. It is brought to you by recipe-of-today.blogspot.com. From preparation to the plate, this recipe takes around <b>30 minutes</b>. It is a good option if you're following a <b>lacto ovo vegetarian</b> diet. Taking all factors into account, this recipe <b>earns a spoonacular score of 26%</b>, which is rather bad. Try <a href=\"https://spoonacular.com/recipes/easy-gluten-free-apple-fritters-1138722\">Easy Gluten Free Apple Fritters</a>, <a href=\"https://spoonacular.com/recipes/easy-homemade-apple-sauce-676445\">Easy Homemade Apple Sauce</a>, and <a href=\"https://spoonacular.com/recipes/easy-homemade-apple-oat-muesli-506904\">Easy Homemade Apple & Oat Muesli</a> for similar recipes.",
-              "title": "Easy Homemade Apple Fritters",
-              "type": "breakfast"
-            },
-            {
-              "calories": 445.69,
-              "carbs": 86.11,
-              "cuisines": [],
-              "diets": [
-                "gluten free",
-                "dairy free",
-                "lacto ovo vegetarian",
-                "vegan"
-              ],
-              "equipment": [
-                {
-                  "name": "Pot"
-                }
-              ],
-              "fat": 4.09,
-              "healthScore": 60,
-              "image": "https://img.spoonacular.com/recipes/716627-312x231.jpg",
-              "ingredients": [
-                {
-                  "aisle": "Canned and Jarred",
-                  "amount": 15,
-                  "consistency": "SOLID",
-                  "id": 16018,
-                  "image": "black-beans.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 425.243,
-                      "unitLong": "grams",
-                      "unitShort": "g"
-                    },
-                    "us": {
-                      "amount": 15,
-                      "unitLong": "ounces",
-                      "unitShort": "oz"
-                    }
-                  },
-                  "meta": [
-                    "drained",
-                    "canned"
-                  ],
-                  "name": "black beans",
-                  "nameClean": "black beans",
-                  "original": "1 15-ounce can black beans, not drained",
-                  "originalName": "black beans, not drained",
-                  "unit": "ounce"
-                },
-                {
-                  "aisle": "Canned and Jarred",
-                  "amount": 10,
-                  "consistency": "SOLID",
-                  "id": 10011693,
-                  "image": "tomatoes-canned.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 283.495,
-                      "unitLong": "grams",
-                      "unitShort": "g"
-                    },
-                    "us": {
-                      "amount": 10,
-                      "unitLong": "ounces",
-                      "unitShort": "oz"
-                    }
-                  },
-                  "meta": [
-                    "diced",
-                    "with  green chilies, not drained",
-                    "canned"
-                  ],
-                  "name": "canned tomatoes",
-                  "nameClean": "canned tomatoes",
-                  "original": "1 10-ounce can Rotel tomatoes with diced green chilies, not drained",
-                  "originalName": "Rotel tomatoes with diced green chilies, not drained",
-                  "unit": "ounce"
-                },
-                {
-                  "aisle": "Spices and Seasonings",
-                  "amount": 2,
-                  "consistency": "SOLID",
-                  "id": 2009,
-                  "image": "chili-powder.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 2,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    },
-                    "us": {
-                      "amount": 2,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    }
-                  },
-                  "meta": [],
-                  "name": "chili powder",
-                  "nameClean": "chili powder",
-                  "original": "2 tsp chili powder",
-                  "originalName": "chili powder",
-                  "unit": "tsp"
-                },
-                {
-                  "aisle": "Spices and Seasonings",
-                  "amount": 0.5,
-                  "consistency": "SOLID",
-                  "id": 1002014,
-                  "image": "ground-cumin.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 0.5,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    },
-                    "us": {
-                      "amount": 0.5,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    }
-                  },
-                  "meta": [],
-                  "name": "cumin",
-                  "nameClean": "cumin",
-                  "original": "1/2 tsp cumin",
-                  "originalName": "cumin",
-                  "unit": "tsp"
-                },
-                {
-                  "aisle": "Spices and Seasonings",
-                  "amount": 0.25,
-                  "consistency": "SOLID",
-                  "id": 1002030,
-                  "image": "pepper.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 0.25,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    },
-                    "us": {
-                      "amount": 0.25,
-                      "unitLong": "teaspoons",
-                      "unitShort": "tsps"
-                    }
-                  },
-                  "meta": [
-                    "black"
-                  ],
-                  "name": "ground pepper",
-                  "nameClean": "ground pepper",
-                  "original": "1/4 tsp ground black pepper",
-                  "originalName": "ground black pepper",
-                  "unit": "tsp"
-                },
-                {
-                  "aisle": "Condiments",
-                  "amount": 4,
-                  "consistency": "LIQUID",
-                  "id": 6168,
-                  "image": "hot-sauce-or-tabasco.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 4,
-                      "unitLong": "dashes",
-                      "unitShort": "dashes"
-                    },
-                    "us": {
-                      "amount": 4,
-                      "unitLong": "dashes",
-                      "unitShort": "dashes"
-                    }
-                  },
-                  "meta": [],
-                  "name": "optional: of hot sauce",
-                  "nameClean": "optional: of hot sauce",
-                  "original": "optional: 4-5 dashes of hot sauce",
-                  "originalName": "optional: of hot sauce",
-                  "unit": "dashes"
-                },
-                {
-                  "aisle": "Oil, Vinegar, Salad Dressing",
-                  "amount": 1,
-                  "consistency": "LIQUID",
-                  "id": 4053,
-                  "image": "olive-oil.jpg",
-                  "measures": {
-                    "metric": {
-                      "amount": 1,
-                      "unitLong": "teaspoon",
-                      "unitShort": "tsp"
-                    },
-                    "us": {
-                      "amount": 1,
-                      "unitLong": "teaspoon",
-                      "unitShort": "tsp"
-                    }
-                  },
-                  "meta": [],
-                  "name": "olive oil",
-                  "nameClean": "olive oil",
-                  "original": "1 tsp olive oil",
-                  "originalName": "olive oil",
-                  "unit": "tsp"
-                },
-                {
-                  "aisle": "Produce",
-                  "amount": 0.25,
-                  "consistency": "SOLID",
-                  "id": 11282,
-                  "image": "brown-onion.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 40,
-                      "unitLong": "grams",
-                      "unitShort": "g"
-                    },
-                    "us": {
-                      "amount": 0.25,
-                      "unitLong": "cups",
-                      "unitShort": "cups"
-                    }
-                  },
-                  "meta": [
-                    "chopped"
-                  ],
-                  "name": "onion",
-                  "nameClean": "onion",
-                  "original": "1/4 cup onion, chopped",
-                  "originalName": "onion, chopped",
-                  "unit": "cup"
-                },
-                {
-                  "aisle": "Pasta and Rice",
-                  "amount": 0.5,
-                  "consistency": "SOLID",
-                  "id": 20444,
-                  "image": "uncooked-white-rice.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 92.5,
-                      "unitLong": "grams",
-                      "unitShort": "g"
-                    },
-                    "us": {
-                      "amount": 0.5,
-                      "unitLong": "cups",
-                      "unitShort": "cups"
-                    }
-                  },
-                  "meta": [
-                    "uncooked"
-                  ],
-                  "name": "rice",
-                  "nameClean": "rice",
-                  "original": "1/2 cup uncooked rice",
-                  "originalName": "uncooked rice",
-                  "unit": "cup"
-                },
-                {
-                  "aisle": "Beverages",
-                  "amount": 3,
-                  "consistency": "LIQUID",
-                  "id": 14412,
-                  "image": "water.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 3,
-                      "unitLong": "Tbsps",
-                      "unitShort": "Tbsps"
-                    },
-                    "us": {
-                      "amount": 3,
-                      "unitLong": "Tbsps",
-                      "unitShort": "Tbsps"
-                    }
-                  },
-                  "meta": [],
-                  "name": "water",
-                  "nameClean": "water",
-                  "original": "3 Tbsp water",
-                  "originalName": "water",
-                  "unit": "Tbsp"
-                }
-              ],
-              "instructions": "<p>Heat the olive oil in a large pot over medium heat. Add onions and saute until soft, or for about 5 minutes. Add all other remaining ingredients and stir together. Increase the heat to medium high and bring to a boil. Cover and reduce heat to medium low so that the mixture simmers. Cook for 15-20 minutes, or until rice is fluffy and liquid is absorbed.* Serve with salsa, cheese, and sour cream.</p>",
-              "pricePerServing": 106.02,
-              "protein": 19.14,
-              "readyInMinutes": 35,
-              "servings": 2,
-              "sourceName": "blogspot.com",
-              "sourceUrl": "http://cooking2perfection.blogspot.com/2012/11/easy-homemade-rice-and-beans.html",
-              "spoonacularScore": 98.625,
-              "summary": "Easy Homemade Rice and Beans is a main course that serves 2. One serving contains <b>446 calories</b>, <b>19g of protein</b>, and <b>4g of fat</b>. For <b>$1.06 per serving</b>, this recipe <b>covers 26%</b> of your daily requirements of vitamins and minerals. A mixture of optional: of hot sauce, canned tomatoes, water, and a handful of other ingredients are all it takes to make this recipe so yummy. This recipe from cooking2perfection.blogspot.com has 471 fans. It is a good option if you're following a <b>gluten free, dairy free, lacto ovo vegetarian, and vegan</b> diet. From preparation to the plate, this recipe takes around <b>35 minutes</b>. Overall, this recipe earns a <b>tremendous spoonacular score of 98%</b>. <a href=\"https://spoonacular.com/recipes/easy-homemade-rice-and-beans-1311839\">Easy Homemade Rice and Beans</a>, <a href=\"https://spoonacular.com/recipes/easy-homemade-rice-and-beans-1303021\">Easy Homemade Rice and Beans</a>, and <a href=\"https://spoonacular.com/recipes/easy-homemade-rice-and-beans-1230117\">Easy Homemade Rice and Beans</a> are very similar to this recipe.",
-              "title": "Easy Homemade Rice and Beans",
-              "type": "lunch"
-            },
-            {
-              "calories": 779.52,
-              "carbs": 86.31,
-              "cuisines": [
-                "American"
-              ],
-              "diets": [
-                "lacto ovo vegetarian"
+                "gluten free"
               ],
               "equipment": [
                 {
                   "name": "Oven"
                 },
                 {
-                  "name": "Bowl"
-                }
-              ],
-              "fat": 35.24,
-              "healthScore": 14,
-              "image": "https://img.spoonacular.com/recipes/715595-312x231.jpg",
-              "ingredients": [
-                {
-                  "aisle": "Pasta and Rice",
-                  "amount": 1,
-                  "consistency": "SOLID",
-                  "id": 10120420,
-                  "image": "farfalle.png",
-                  "measures": {
-                    "metric": {
-                      "amount": 1,
-                      "unitLong": "package",
-                      "unitShort": "pkg"
-                    },
-                    "us": {
-                      "amount": 1,
-                      "unitLong": "package",
-                      "unitShort": "pkg"
-                    }
-                  },
-                  "meta": [],
-                  "name": "bowtie pasta cook as directed",
-                  "nameClean": "bowtie pasta cook as directed",
-                  "original": "1 package of Bowtie pasta cook as directed",
-                  "originalName": "Bowtie pasta cook as directed",
-                  "unit": "package"
+                  "name": "Pot"
                 },
                 {
-                  "aisle": "Cheese",
+                  "name": "Bowl"
+                },
+                {
+                  "name": "Whisk"
+                },
+                {
+                  "name": "Muffin Tin"
+                }
+              ],
+              "fat": 7.7,
+              "healthScore": 2,
+              "image": "https://img.spoonacular.com/recipes/1017374-312x231.jpg",
+              "ingredients": [
+                {
+                  "aisle": "Produce",
                   "amount": 1,
                   "consistency": "SOLID",
-                  "id": 1021009,
-                  "image": "cheddar-cheese.png",
+                  "id": 10211821,
+                  "image": "bell-pepper-orange.png",
                   "measures": {
                     "metric": {
-                      "amount": 113,
-                      "unitLong": "grams",
-                      "unitShort": "g"
+                      "amount": 1,
+                      "unitLong": "",
+                      "unitShort": ""
                     },
                     "us": {
                       "amount": 1,
-                      "unitLong": "cup",
-                      "unitShort": "cup"
+                      "unitLong": "",
+                      "unitShort": ""
+                    }
+                  },
+                  "meta": [
+                    "chopped"
+                  ],
+                  "name": "bell pepper",
+                  "nameClean": "bell pepper",
+                  "original": "1 bell pepper chopped",
+                  "originalName": "bell pepper chopped",
+                  "unit": ""
+                },
+                {
+                  "aisle": "Milk, Eggs, Other Dairy",
+                  "amount": 12,
+                  "consistency": "SOLID",
+                  "id": 1123,
+                  "image": "egg.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 12,
+                      "unitLong": "",
+                      "unitShort": ""
+                    },
+                    "us": {
+                      "amount": 12,
+                      "unitLong": "",
+                      "unitShort": ""
                     }
                   },
                   "meta": [],
-                  "name": "extra sharp cheddar cheese",
-                  "nameClean": "extra sharp cheddar cheese",
-                  "original": "1 cup Extra Sharp Cheddar cheese",
-                  "originalName": "Extra Sharp Cheddar cheese",
+                  "name": "eggs",
+                  "nameClean": "eggs",
+                  "original": "12 eggs",
+                  "originalName": "eggs",
+                  "unit": ""
+                },
+                {
+                  "aisle": "Milk, Eggs, Other Dairy",
+                  "amount": 0.5,
+                  "consistency": "LIQUID",
+                  "id": 1077,
+                  "image": "milk.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 122,
+                      "unitLong": "milliliters",
+                      "unitShort": "ml"
+                    },
+                    "us": {
+                      "amount": 0.5,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [],
+                  "name": "milk",
+                  "nameClean": "milk",
+                  "original": "1/2 cup milk",
+                  "originalName": "milk",
                   "unit": "cup"
                 },
                 {
+                  "aisle": "Produce",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 11282,
+                  "image": "brown-onion.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "",
+                      "unitShort": ""
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "",
+                      "unitShort": ""
+                    }
+                  },
+                  "meta": [
+                    "chopped"
+                  ],
+                  "name": "sm onion",
+                  "nameClean": "sm onion",
+                  "original": "1 sm onion chopped",
+                  "originalName": "sm onion chopped",
+                  "unit": ""
+                },
+                {
+                  "aisle": "Frozen",
+                  "amount": 12,
+                  "consistency": "SOLID",
+                  "id": 11398,
+                  "image": "tater-tots.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 12,
+                      "unitLong": "",
+                      "unitShort": ""
+                    },
+                    "us": {
+                      "amount": 12,
+                      "unitLong": "",
+                      "unitShort": ""
+                    }
+                  },
+                  "meta": [],
+                  "name": "potato tots",
+                  "nameClean": "potato tots",
+                  "original": "12 potato tots",
+                  "originalName": "potato tots",
+                  "unit": ""
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 12,
+                  "consistency": "SOLID",
+                  "id": 1102047,
+                  "image": "salt-and-pepper.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 12,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    },
+                    "us": {
+                      "amount": 12,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    }
+                  },
+                  "meta": [
+                    "to taste"
+                  ],
+                  "name": "salt and pepper",
+                  "nameClean": "salt and pepper",
+                  "original": "salt and pepper to taste",
+                  "originalName": "salt and pepper to taste",
+                  "unit": "servings"
+                },
+                {
                   "aisle": "Cheese",
                   "amount": 1,
                   "consistency": "SOLID",
-                  "id": 1021009,
+                  "id": 1011026,
                   "image": "cheddar-cheese.png",
                   "measures": {
                     "metric": {
-                      "amount": 113,
+                      "amount": 112,
                       "unitLong": "grams",
                       "unitShort": "g"
                     },
@@ -687,13 +221,310 @@
                     }
                   },
                   "meta": [
-                    "white"
+                    "shredded"
                   ],
-                  "name": "extra sharp cheddar cheese",
-                  "nameClean": "extra sharp cheddar cheese",
-                  "original": "1 cup Extra Sharp White Cheddar cheese",
-                  "originalName": "Extra Sharp White Cheddar cheese",
+                  "name": "cheese",
+                  "nameClean": "cheese",
+                  "original": "1 cup cheese shredded",
+                  "originalName": "cheese shredded",
                   "unit": "cup"
+                },
+                {
+                  "aisle": "Meat",
+                  "amount": 0.5,
+                  "consistency": "SOLID",
+                  "id": 5165,
+                  "image": "turkey-raw-whole.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 49.7,
+                      "unitLong": "grams",
+                      "unitShort": "g"
+                    },
+                    "us": {
+                      "amount": 0.5,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [
+                    "chopped"
+                  ],
+                  "name": "turkey",
+                  "nameClean": "turkey",
+                  "original": "1/2 cup turkey chopped",
+                  "originalName": "turkey chopped",
+                  "unit": "cup"
+                }
+              ],
+              "instructions": "InstructionsHeat oven to 350. Whisk eggs together in a medium bowl. Add chopped pepper and onion, salt and pepper, cheese, and milk. Fill muffin tin halfway with egg mixture.Sprinkle turkey meat into each.Add a potato tot to each. Top with cheese. Place in oven for 20 minutes or until fully cooked. Serve immediately or store for later.",
+              "pricePerServing": 47.53,
+              "protein": 9.23,
+              "readyInMinutes": 30,
+              "servings": 12,
+              "sourceName": "pinkwhen.com",
+              "sourceUrl": "https://www.pinkwhen.com/easy-weekday-breakfast-muffins/",
+              "spoonacularScore": 34.359439849853516,
+              "summary": "Need a <b>gluten free breakfast</b>? Easy Weekday Breakfast Muffins could be an outstanding recipe to try. One portion of this dish contains around <b>9g of protein</b>, <b>8g of fat</b>, and a total of <b>126 calories</b>. This recipe serves 12. For <b>48 cents per serving</b>, this recipe <b>covers 8%</b> of your daily requirements of vitamins and minerals. 2 people were impressed by this recipe. A mixture of sm onion, turkey, milk, and a handful of other ingredients are all it takes to make this recipe so delicious. It is brought to you by Pink When. From preparation to the plate, this recipe takes approximately <b>30 minutes</b>. Overall, this recipe earns a <b>rather bad spoonacular score of 26%</b>. Similar recipes include <a href=\"https://spoonacular.com/recipes/easy-weekday-breakfast-muffins-1732671\">Easy Weekday Breakfast Muffins</a>, <a href=\"https://spoonacular.com/recipes/easy-weekday-breakfast-muffins-1375053\">Easy Weekday Breakfast Muffins</a>, and <a href=\"https://spoonacular.com/recipes/easy-weekday-breakfast-muffins-1581591\">Easy Weekday Breakfast Muffins</a>.",
+              "title": "Easy Weekday Breakfast Muffins",
+              "type": "breakfast"
+            },
+            {
+              "calories": 916.27,
+              "carbs": 47.21,
+              "cuisines": [],
+              "diets": [
+                "dairy free"
+              ],
+              "equipment": [
+                {
+                  "name": "Bowl"
+                },
+                {
+                  "name": "Baking Sheet"
+                }
+              ],
+              "fat": 74.14,
+              "healthScore": 17,
+              "image": "https://img.spoonacular.com/recipes/1697785-312x231.jpg",
+              "ingredients": [
+                {
+                  "aisle": "Produce",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 11529,
+                  "image": "tomato.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "large",
+                      "unitShort": "large"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "large",
+                      "unitShort": "large"
+                    }
+                  },
+                  "meta": [
+                    "sliced"
+                  ],
+                  "name": "tomato",
+                  "nameClean": "tomato",
+                  "original": "1 large tomato, sliced",
+                  "originalName": "tomato, sliced",
+                  "unit": "large"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 2,
+                  "consistency": "SOLID",
+                  "id": 11252,
+                  "image": "iceberg-lettuce.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 2,
+                      "unitLong": "leaves",
+                      "unitShort": "leaf"
+                    },
+                    "us": {
+                      "amount": 2,
+                      "unitLong": "leaves",
+                      "unitShort": "leaf"
+                    }
+                  },
+                  "meta": [
+                    "dry",
+                    "washed and patted "
+                  ],
+                  "name": "lettuce",
+                  "nameClean": "lettuce",
+                  "original": "2 leaves lettuce, washed and patted dry",
+                  "originalName": "lettuce, washed and patted dry",
+                  "unit": "leaves"
+                },
+                {
+                  "aisle": "Bakery/Bread",
+                  "amount": 2,
+                  "consistency": "SOLID",
+                  "id": 18064,
+                  "image": "white-bread.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 2,
+                      "unitLong": "slices",
+                      "unitShort": "slice"
+                    },
+                    "us": {
+                      "amount": 2,
+                      "unitLong": "slices",
+                      "unitShort": "slice"
+                    }
+                  },
+                  "meta": [
+                    "toasted"
+                  ],
+                  "name": "bread",
+                  "nameClean": "bread",
+                  "original": "2 slices bread, toasted",
+                  "originalName": "bread, toasted",
+                  "unit": "slices"
+                },
+                {
+                  "aisle": "Meat",
+                  "amount": 3,
+                  "consistency": "SOLID",
+                  "id": 10123,
+                  "image": "raw-bacon.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
+                      "unitLong": "strips",
+                      "unitShort": "strips"
+                    },
+                    "us": {
+                      "amount": 3,
+                      "unitLong": "strips",
+                      "unitShort": "strips"
+                    }
+                  },
+                  "meta": [],
+                  "name": "bacon",
+                  "nameClean": "bacon",
+                  "original": "3 strips bacon",
+                  "originalName": "bacon",
+                  "unit": "strips"
+                },
+                {
+                  "aisle": "Condiments",
+                  "amount": 3,
+                  "consistency": "LIQUID",
+                  "id": 4025,
+                  "image": "mayonnaise.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
+                      "unitLong": "Tbsps",
+                      "unitShort": "Tbsps"
+                    },
+                    "us": {
+                      "amount": 3,
+                      "unitLong": "Tbsps",
+                      "unitShort": "Tbsps"
+                    }
+                  },
+                  "meta": [],
+                  "name": "mayonnaise",
+                  "nameClean": "mayonnaise",
+                  "original": "3 Tbsp mayonnaise",
+                  "originalName": "mayonnaise",
+                  "unit": "Tbsp"
+                },
+                {
+                  "aisle": "Oil, Vinegar, Salad Dressing",
+                  "amount": 1,
+                  "consistency": "LIQUID",
+                  "id": 1034053,
+                  "image": "olive-oil.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "Tbsp",
+                      "unitShort": "Tbsp"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "Tbsp",
+                      "unitShort": "Tbsp"
+                    }
+                  },
+                  "meta": [
+                    "extra-virgin"
+                  ],
+                  "name": "olive oil",
+                  "nameClean": "olive oil",
+                  "original": "1 Tbsp extra-virgin olive oil",
+                  "originalName": "extra-virgin olive oil",
+                  "unit": "Tbsp"
+                },
+                {
+                  "aisle": "Baking",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 19334,
+                  "image": "light-brown-sugar.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "Tbsp",
+                      "unitShort": "Tbsp"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "Tbsp",
+                      "unitShort": "Tbsp"
+                    }
+                  },
+                  "meta": [],
+                  "name": "brown sugar",
+                  "nameClean": "brown sugar",
+                  "original": "1 Tbsp brown sugar",
+                  "originalName": "brown sugar",
+                  "unit": "Tbsp"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 12,
+                  "consistency": "SOLID",
+                  "id": 2044,
+                  "image": "fresh-basil.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 12,
+                      "unitLong": "leaves",
+                      "unitShort": "leaf"
+                    },
+                    "us": {
+                      "amount": 12,
+                      "unitLong": "leaves",
+                      "unitShort": "leaf"
+                    }
+                  },
+                  "meta": [
+                    "thinly sliced"
+                  ],
+                  "name": "basil",
+                  "nameClean": "basil",
+                  "original": "12 leaves basil, thinly sliced",
+                  "originalName": "basil, thinly sliced",
+                  "unit": "leaves"
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 6,
+                  "consistency": "SOLID",
+                  "id": 99226,
+                  "image": "fresh-sage.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 6,
+                      "unitLong": "leaves",
+                      "unitShort": "leaf"
+                    },
+                    "us": {
+                      "amount": 6,
+                      "unitLong": "leaves",
+                      "unitShort": "leaf"
+                    }
+                  },
+                  "meta": [
+                    "thinly sliced"
+                  ],
+                  "name": "sage",
+                  "nameClean": "sage",
+                  "original": "6 leaves sage, thinly sliced",
+                  "originalName": "sage, thinly sliced",
+                  "unit": "leaves"
                 },
                 {
                   "aisle": "Spices and Seasonings",
@@ -704,31 +535,255 @@
                   "measures": {
                     "metric": {
                       "amount": 1,
-                      "unitLong": "teaspoon",
-                      "unitShort": "tsp"
+                      "unitLong": "serving",
+                      "unitShort": "serving"
                     },
                     "us": {
                       "amount": 1,
-                      "unitLong": "teaspoon",
-                      "unitShort": "tsp"
+                      "unitLong": "serving",
+                      "unitShort": "serving"
                     }
                   },
                   "meta": [],
-                  "name": "salt and pepper",
-                  "nameClean": "salt and pepper",
-                  "original": "1 tsp salt and pepper",
-                  "originalName": "salt and pepper",
-                  "unit": "tsp"
+                  "name": "salt & pepper",
+                  "nameClean": "salt & pepper",
+                  "original": "Salt &amp; pepper",
+                  "originalName": "Salt & pepper",
+                  "unit": "serving"
+                }
+              ],
+              "instructions": "Place bacon a baking sheet and sprinkle with brown sugar.\u00a0 Bake at 325\u2109 for 10 minutes.\n\nSlice tomatoes and sprinkle with salt &amp; pepper.\u00a0 Wash lettuce and pat dry.\n\nIn a small bowl, mix together mayonnaise, olive oil, basil, sage, salt, &amp; pepper.\n\nSpread sauce on both sides of bread and assemble sandwich.",
+              "pricePerServing": 231.87,
+              "protein": 16.68,
+              "readyInMinutes": 20,
+              "servings": 1,
+              "sourceName": "Maplewood Road",
+              "sourceUrl": "https://maplewoodroad.com/upgrade-blt/",
+              "spoonacularScore": 60.489410400390625,
+              "summary": "How to Upgrade a Simple BLT to Your Favorite Summer Lunch with These 2 Simple Tricks is a main course that serves 1. One portion of this dish contains roughly <b>17g of protein</b>, <b>74g of fat</b>, and a total of <b>916 calories</b>. For <b>$2.32 per serving</b>, this recipe <b>covers 26%</b> of your daily requirements of vitamins and minerals. From preparation to the plate, this recipe takes around <b>20 minutes</b>. A mixture of sage, mayonnaise, basil, and a handful of other ingredients are all it takes to make this recipe so scrumptious. It is brought to you by spoonacular user <a href=\"/profile/maplewoodroad\">maplewoodroad</a>. It is a good option if you're following a <b>dairy free</b> diet. It will be a hit at your <b>The Fourth Of July</b> event. If you like this recipe, take a look at these similar recipes: <a href=\"https://spoonacular.com/recipes/my-favorite-simple-roast-chicken-151652\">My Favorite Simple Roast Chicken</a>, <a href=\"https://spoonacular.com/recipes/thomas-kellers-favorite-simple-roast-chicken-253281\">Thomas Keller\u2019s Favorite Simple Roast Chicken</a>, and <a href=\"https://spoonacular.com/recipes/simple-cabbage-and-eggs-my-favorite-light-meal-1564383\">Simple Cabbage and Eggs (My Favorite Light Meal!)</a>.",
+              "title": "How to Upgrade a Simple BLT to Your Favorite Summer Lunch with These 2 Simple Tricks",
+              "type": "lunch"
+            },
+            {
+              "calories": 1131.83,
+              "carbs": 84.45,
+              "cuisines": [],
+              "diets": [
+                "gluten free",
+                "dairy free",
+                "whole 30"
+              ],
+              "equipment": [
+                {
+                  "name": "Oven"
                 },
                 {
-                  "aisle": "Milk, Eggs, Other Dairy",
-                  "amount": 0.25,
+                  "name": "Pan"
+                },
+                {
+                  "name": "Pot"
+                }
+              ],
+              "fat": 61.13,
+              "healthScore": 89,
+              "image": "https://img.spoonacular.com/recipes/665261-312x231.jpg",
+              "ingredients": [
+                {
+                  "aisle": "Meat",
+                  "amount": 1,
                   "consistency": "SOLID",
-                  "id": 1056,
-                  "image": "sour-cream.jpg",
+                  "id": 5006,
+                  "image": "whole-chicken.jpg",
                   "measures": {
                     "metric": {
-                      "amount": 57.5,
+                      "amount": 1,
+                      "unitLong": "",
+                      "unitShort": ""
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "",
+                      "unitShort": ""
+                    }
+                  },
+                  "meta": [
+                    "whole",
+                    "free range",
+                    "( Chicken)"
+                  ],
+                  "name": "chicken -the one here is 4.5lbs.",
+                  "nameClean": "chicken -the one here is 4.5lbs.",
+                  "original": "1 whole chicken -the one here is about 4.5lbs. (Free Range Chicken)",
+                  "originalName": "whole chicken -the one here is about 4.5lbs. (Free Range Chicken)",
+                  "unit": ""
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 1,
+                  "consistency": "SOLID",
+                  "id": 11294,
+                  "image": "sweet-onion.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 1,
+                      "unitLong": "",
+                      "unitShort": ""
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "",
+                      "unitShort": ""
+                    }
+                  },
+                  "meta": [
+                    "sweet",
+                    "(Vidalia or Walla Walla)"
+                  ],
+                  "name": "onion",
+                  "nameClean": "onion",
+                  "original": "1 sweet onion (Vidalia or Walla Walla)",
+                  "originalName": "sweet onion (Vidalia or Walla Walla)",
+                  "unit": ""
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 5,
+                  "consistency": "SOLID",
+                  "id": 10211215,
+                  "image": "garlic.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 5,
+                      "unitLong": "",
+                      "unitShort": ""
+                    },
+                    "us": {
+                      "amount": 5,
+                      "unitLong": "",
+                      "unitShort": ""
+                    }
+                  },
+                  "meta": [],
+                  "name": "garlic cloves",
+                  "nameClean": "garlic cloves",
+                  "original": "5 garlic cloves",
+                  "originalName": "garlic cloves",
+                  "unit": ""
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 3,
+                  "consistency": "SOLID",
+                  "id": 11090,
+                  "image": "broccoli.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
+                      "unitLong": "heads",
+                      "unitShort": "heads"
+                    },
+                    "us": {
+                      "amount": 3,
+                      "unitLong": "heads",
+                      "unitShort": "heads"
+                    }
+                  },
+                  "meta": [
+                    "washed and cut"
+                  ],
+                  "name": "broccoli",
+                  "nameClean": "broccoli",
+                  "original": "3 heads broccoli- washed and cut",
+                  "originalName": "broccoli- washed and cut",
+                  "unit": "heads"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 5,
+                  "consistency": "SOLID",
+                  "id": 11124,
+                  "image": "sliced-carrot.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 5,
+                      "unitLong": "larges",
+                      "unitShort": "large"
+                    },
+                    "us": {
+                      "amount": 5,
+                      "unitLong": "larges",
+                      "unitShort": "large"
+                    }
+                  },
+                  "meta": [
+                    "peeled",
+                    "sliced"
+                  ],
+                  "name": "carrots",
+                  "nameClean": "carrots",
+                  "original": "5 large carrots- peeled and sliced",
+                  "originalName": "carrots- peeled and sliced",
+                  "unit": "large"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 2,
+                  "consistency": "SOLID",
+                  "id": 9150,
+                  "image": "lemon.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 2,
+                      "unitLong": "",
+                      "unitShort": ""
+                    },
+                    "us": {
+                      "amount": 2,
+                      "unitLong": "",
+                      "unitShort": ""
+                    }
+                  },
+                  "meta": [],
+                  "name": "lemons",
+                  "nameClean": "lemons",
+                  "original": "2 lemons",
+                  "originalName": "lemons",
+                  "unit": ""
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 6,
+                  "consistency": "SOLID",
+                  "id": 2049,
+                  "image": "thyme.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 6,
+                      "unitLong": "sprigs",
+                      "unitShort": "sprigs"
+                    },
+                    "us": {
+                      "amount": 6,
+                      "unitLong": "sprigs",
+                      "unitShort": "sprigs"
+                    }
+                  },
+                  "meta": [],
+                  "name": "thyme",
+                  "nameClean": "thyme",
+                  "original": "6 sprigs thyme",
+                  "originalName": "thyme",
+                  "unit": "sprigs"
+                },
+                {
+                  "aisle": "Oil, Vinegar, Salad Dressing",
+                  "amount": 0.25,
+                  "consistency": "LIQUID",
+                  "id": 4053,
+                  "image": "olive-oil.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 54,
                       "unitLong": "milliliters",
                       "unitShort": "ml"
                     },
@@ -738,90 +793,257 @@
                       "unitShort": "cups"
                     }
                   },
-                  "meta": [
-                    "sour"
-                  ],
-                  "name": "cream",
-                  "nameClean": "cream",
-                  "original": "1/4 cup sour cream",
-                  "originalName": "sour cream",
-                  "unit": "cup"
+                  "meta": [],
+                  "name": "olive oil",
+                  "nameClean": "olive oil",
+                  "original": "1/4 c. olive oil",
+                  "originalName": "olive oil",
+                  "unit": "c"
                 },
                 {
-                  "aisle": "Milk, Eggs, Other Dairy",
-                  "amount": 0.25,
-                  "consistency": "SOLID",
-                  "id": 1145,
-                  "image": "butter-sliced.jpg",
+                  "aisle": "Oil, Vinegar, Salad Dressing",
+                  "amount": 0.5,
+                  "consistency": "LIQUID",
+                  "id": 2048,
+                  "image": "apple-cider-vinegar.jpg",
                   "measures": {
                     "metric": {
-                      "amount": 56.75,
-                      "unitLong": "grams",
-                      "unitShort": "g"
+                      "amount": 119.5,
+                      "unitLong": "milliliters",
+                      "unitShort": "ml"
                     },
                     "us": {
-                      "amount": 0.25,
+                      "amount": 0.5,
                       "unitLong": "cups",
                       "unitShort": "cups"
                     }
                   },
-                  "meta": [
-                    "unsalted",
-                    "room temperature"
-                  ],
-                  "name": "butter",
-                  "nameClean": "butter",
-                  "original": "1/4 cup unsalted butter room temperature",
-                  "originalName": "unsalted butter room temperature",
-                  "unit": "cup"
+                  "meta": [],
+                  "name": "apple cider vinegar",
+                  "nameClean": "apple cider vinegar",
+                  "original": "1/2 c. apple cider vinegar",
+                  "originalName": "apple cider vinegar",
+                  "unit": "c"
                 },
                 {
-                  "aisle": "Produce",
-                  "amount": 4,
-                  "consistency": "SOLID",
-                  "id": 10511297,
-                  "image": "parsley.jpg",
+                  "aisle": "Canned and Jarred",
+                  "amount": 2,
+                  "consistency": "LIQUID",
+                  "id": 6172,
+                  "image": "chicken-broth.png",
                   "measures": {
                     "metric": {
-                      "amount": 4,
+                      "amount": 480,
+                      "unitLong": "milliliters",
+                      "unitShort": "ml"
+                    },
+                    "us": {
+                      "amount": 2,
+                      "unitLong": "cups",
+                      "unitShort": "cups"
+                    }
+                  },
+                  "meta": [],
+                  "name": "chicken stock",
+                  "nameClean": "chicken stock",
+                  "original": "2 c. veggie or chicken stock",
+                  "originalName": "veggie or chicken stock",
+                  "unit": "c"
+                },
+                {
+                  "aisle": "Beverages",
+                  "amount": 1,
+                  "consistency": "LIQUID",
+                  "id": 14412,
+                  "image": "water.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 236.588,
+                      "unitLong": "milliliters",
+                      "unitShort": "ml"
+                    },
+                    "us": {
+                      "amount": 1,
+                      "unitLong": "cup",
+                      "unitShort": "cup"
+                    }
+                  },
+                  "meta": [],
+                  "name": "water",
+                  "nameClean": "water",
+                  "original": "1-2 c. water",
+                  "originalName": "water",
+                  "unit": "c"
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 3,
+                  "consistency": "SOLID",
+                  "id": 1002030,
+                  "image": "pepper.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
                       "unitLong": "servings",
                       "unitShort": "servings"
                     },
                     "us": {
-                      "amount": 4,
+                      "amount": 3,
                       "unitLong": "servings",
                       "unitShort": "servings"
                     }
                   },
-                  "meta": [
-                    "fresh",
-                    "for garnish"
-                  ],
-                  "name": "parsley",
-                  "nameClean": "parsley",
-                  "original": "Fresh Parsley for garnish",
-                  "originalName": "Fresh Parsley for garnish",
+                  "meta": [],
+                  "name": "ground pepper",
+                  "nameClean": "ground pepper",
+                  "original": "ground pepper",
+                  "originalName": "ground pepper",
+                  "unit": "servings"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 3,
+                  "consistency": "SOLID",
+                  "id": 11352,
+                  "image": "potatoes-yukon-gold.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    },
+                    "us": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    }
+                  },
+                  "meta": [],
+                  "name": "potatoes",
+                  "nameClean": "potatoes",
+                  "original": "potatoes",
+                  "originalName": "potatoes",
+                  "unit": "servings"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 3,
+                  "consistency": "SOLID",
+                  "id": 11282,
+                  "image": "brown-onion.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    },
+                    "us": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    }
+                  },
+                  "meta": [],
+                  "name": "onion",
+                  "nameClean": "onion",
+                  "original": "onion",
+                  "originalName": "onion",
+                  "unit": "servings"
+                },
+                {
+                  "aisle": "Produce",
+                  "amount": 3,
+                  "consistency": "SOLID",
+                  "id": 11215,
+                  "image": "garlic.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    },
+                    "us": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    }
+                  },
+                  "meta": [],
+                  "name": "garlic",
+                  "nameClean": "garlic",
+                  "original": "garlic",
+                  "originalName": "garlic",
+                  "unit": "servings"
+                },
+                {
+                  "aisle": "Canned and Jarred",
+                  "amount": 3,
+                  "consistency": "LIQUID",
+                  "id": 1006615,
+                  "image": "chicken-broth.png",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    },
+                    "us": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    }
+                  },
+                  "meta": [],
+                  "name": "veggie stock",
+                  "nameClean": "veggie stock",
+                  "original": "veggie stock",
+                  "originalName": "veggie stock",
+                  "unit": "servings"
+                },
+                {
+                  "aisle": "Spices and Seasonings",
+                  "amount": 3,
+                  "consistency": "SOLID",
+                  "id": 1102047,
+                  "image": "salt-and-pepper.jpg",
+                  "measures": {
+                    "metric": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    },
+                    "us": {
+                      "amount": 3,
+                      "unitLong": "servings",
+                      "unitShort": "servings"
+                    }
+                  },
+                  "meta": [],
+                  "name": "salt and pepper",
+                  "nameClean": "salt and pepper",
+                  "original": "salt and pepper",
+                  "originalName": "salt and pepper",
                   "unit": "servings"
                 }
               ],
-              "instructions": "Instructions\n\nStep 1: Heat your oven to 350 degrees Fahrenheit, and then cook your pasta as directed. Drain.\n\nStep 2: Shred the cheese. Add cooked noodles, cheese, sour cream, salt and pepper, and butter to a medium mixing bowl and stir until combined.\n\nStep 3: Add to a 9 x 13 prepared casserole dish, top with extra cheese if desired, and bake for 20 minutes.\n\nStep 4: Remove from oven and serve hot.",
-              "pricePerServing": 134.61,
-              "protein": 28.42,
-              "readyInMinutes": 35,
-              "servings": 4,
-              "sourceName": "pinkwhen.com",
-              "sourceUrl": "https://www.pinkwhen.com/mac-and-cheese-recipe/",
-              "spoonacularScore": 78.34317779541016,
-              "summary": "How to Make the Cheesiest Bowtie Mac and Cheese might be just the main course you are searching for. This recipe serves 4 and costs $1.35 per serving. One portion of this dish contains roughly <b>28g of protein</b>, <b>35g of fat</b>, and a total of <b>780 calories</b>. It is a good option if you're following a <b>lacto ovo vegetarian</b> diet. From preparation to the plate, this recipe takes around <b>35 minutes</b>. If you have salt and pepper, butter, extra sharp cheddar cheese, and a few other ingredients on hand, you can make it. This recipe is typical of American cuisine. It is brought to you by Pink When. 402 people found this recipe to be tasty and satisfying. Taking all factors into account, this recipe <b>earns a spoonacular score of 69%</b>, which is solid. Users who liked this recipe also liked <a href=\"https://spoonacular.com/recipes/how-to-make-the-cheesiest-bowtie-mac-and-cheese-1527865\">How to Make the Cheesiest Bowtie Mac and Cheese</a>, <a href=\"https://spoonacular.com/recipes/cheesiest-bowtie-mac-and-cheese-1367377\">Cheesiest Bowtie Mac and Cheese</a>, and <a href=\"https://spoonacular.com/recipes/the-cheesiest-spinach-and-cheese-lasagna-1524533\">The Cheesiest Spinach and Cheese Lasagna</a>.",
-              "title": "How to Make the Cheesiest Bowtie Mac and Cheese",
+              "instructions": "First, preheat your oven to 375.\nThen, place your chicken in a baking pot or pan. Be sure to check and remove that little bag of goodies from inside of the chicken.\nPour in your chicken stock, apple cider vinegar, and 1c. water.\nDepending on how many vegetables you end up adding, you may add more water.\nWash your vegetables. Peel and chop your carrots, and chop your broccoli. Throw your veggies into the pot.\nCut and add potatoes at this time if you are going for the full chicken dinner.  Also, If you are serving more guest, add more of each vegetable.\nNow, grind a little fresh pepper onto your chicken. Set aside.\nCut your onion and mince your garlic.\nIn a sauce pan, add onion, garlic, and olive oil. Saute for several minutes. Pour onto your chicken. You should have excess olive oil in your pan that you can pour and rub over your chicken.\nLast steps: Slice your lemons. Squeeze them over your chicken and all about in your pot. I like to lay some on my chicken and then just throw the rest in.\nThen add a few sprigs of thyme. I through in several whole springs, as well as sheered and sprinkled some onto the chicken.\nCover and place your beautiful chicken into the oven on 375 for 1 hr. After an hour, un-cover and cook for at least 30min. until done and browned on top.\nThen, remove from  the oven, and serve.",
+              "pricePerServing": 592.84,
+              "protein": 72.45,
+              "readyInMinutes": 45,
+              "servings": 3,
+              "sourceName": "Foodista",
+              "sourceUrl": "https://www.foodista.com/recipe/Q5H23WXX/whole-chicken-dinner",
+              "spoonacularScore": 90.82688903808594,
+              "summary": "Whole Chicken Dinner might be just the main course you are searching for. This recipe serves 3 and costs $5.93 per serving. One serving contains <b>1132 calories</b>, <b>72g of protein</b>, and <b>61g of fat</b>. This recipe is liked by 1 foodies and cooks. This recipe from Foodista requires chicken stock, onion, apple cider vinegar, and potatoes. It is a good option if you're following a <b>gluten free, dairy free, and whole 30</b> diet. From preparation to the plate, this recipe takes around <b>45 minutes</b>. Overall, this recipe earns a <b>tremendous spoonacular score of 89%</b>. Similar recipes include <a href=\"https://spoonacular.com/recipes/pecan-crusted-chicken-dinner-for-dinner-620840\">Pecan-Crusted Chicken Dinner for Dinner</a>, <a href=\"https://spoonacular.com/recipes/whole-chicken-dinner-1629221\">Whole Chicken Dinner</a>, and <a href=\"https://spoonacular.com/recipes/chicken-dinner-133802\">Chicken Dinner</a>.",
+              "title": "Whole Chicken Dinner",
               "type": "dinner"
             }
           ],
           "user_preferences": {
             "foods": "",
             "height": 178,
-            "restrictions": "vegetarian ",
-            "weight": 82
+            "restrictions": "",
+            "weight": 68
           }
         }
       ],
